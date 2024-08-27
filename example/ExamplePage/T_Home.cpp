@@ -149,17 +149,11 @@ T_Home::T_Home(QWidget* parent)
     checkMenu->addAction("查看3");
     checkMenu->addAction("查看4");
 
-    ElaMenu* checkMenu1 = _homeMenu->addMenu(ElaIconType::Cubes, "查看");
+    ElaMenu* checkMenu1 = checkMenu->addMenu(ElaIconType::Cubes, "查看");
     checkMenu1->addAction("查看1");
     checkMenu1->addAction("查看2");
     checkMenu1->addAction("查看3");
     checkMenu1->addAction("查看4");
-
-    ElaMenu* checkMenu2 = checkMenu->addMenu(ElaIconType::Cubes, "查看");
-    checkMenu2->addAction("查看1");
-    checkMenu2->addAction("查看2");
-    checkMenu2->addAction("查看3");
-    checkMenu2->addAction("查看4");
 
     // QKeySequence key = QKeySequence(Qt::CTRL | Qt::Key_S);
 

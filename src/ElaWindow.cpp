@@ -47,6 +47,8 @@ ElaWindow::ElaWindow(QWidget* parent)
         ElaNavigationRouter::getInstance()->navigationRouteBack();
     });
     connect(d->_appBar, &ElaAppBar::closeButtonClicked, this, &ElaWindow::closeButtonClicked);
+
+
     // 导航栏
     d->_navigationBar = new ElaNavigationBar(this);
     // 返回按钮状态变更

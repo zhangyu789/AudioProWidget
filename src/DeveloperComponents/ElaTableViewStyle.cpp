@@ -191,11 +191,14 @@ void ElaTableViewStyle::drawControl(ControlElement element, const QStyleOption* 
             QRect itemRect = option->rect;
             painter->save();
             painter->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform | QPainter::TextAntialiasing);
+
+
             // QRect checkRect = proxy()->subElementRect(SE_ItemViewItemCheckIndicator, vopt, widget);
             QRect iconRect = proxy()->subElementRect(SE_ItemViewItemDecoration, vopt, widget);
             QRect textRect = proxy()->subElementRect(SE_ItemViewItemText, vopt, widget);
             iconRect.adjust(_horizontalPadding, 0, _horizontalPadding, 0);
             textRect.adjust(_horizontalPadding, 0, -_horizontalPadding, 0);
+
             // 图标绘制
             if (!vopt->icon.isNull())
             {
@@ -211,12 +214,17 @@ void ElaTableViewStyle::drawControl(ControlElement element, const QStyleOption* 
                 QIcon::State state = vopt->state & QStyle::State_Open ? QIcon::On : QIcon::Off;
                 vopt->icon.paint(painter, iconRect, vopt->decorationAlignment, mode, state);
             }
+
+            // 设置文本居中显示
+            Qt::Alignment alignment = Qt::AlignCenter; // 文本居中
+            // vopt->displayAlignment = alignment;
             // 文字绘制
             if (!vopt->text.isEmpty())
             {
                 painter->setPen(ElaThemeColor(_themeMode, WindowText));
-                painter->drawText(textRect, vopt->displayAlignment, vopt->text);
+                painter->drawText(textRect, alignment, vopt->text); // 使用设置好的对齐方式
             }
+
             // 选中特效
             int heightOffset = itemRect.height() / 4;
             painter->setPen(Qt::NoPen);

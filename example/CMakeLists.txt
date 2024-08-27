@@ -37,7 +37,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
             list(APPEND resource_files ${filename})
     endforeach(filepath)
 
-    qt_add_resources(${PROJECT_NAME} "ElaWidgetToolsExample"
+    qt_add_resources(${PROJECT_NAME} "Audio Pro"
         RESOURCES PREFIX "/"
         FILES
         ${resource_files}

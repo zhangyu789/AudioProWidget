@@ -27,7 +27,7 @@ ElaNavigationBar::ElaNavigationBar(QWidget* parent)
 {
     Q_D(ElaNavigationBar);
     d->q_ptr = this;
-    setFixedWidth(300);
+    setFixedWidth(190);
     d->_pIsTransparent = true;
     d->_windowLinearGradient = new QLinearGradient(0, 0, width(), height());
     d->_windowLinearGradient->setColorAt(0, ElaThemeColor(ElaThemeType::Light, NavigationBaseStart));
@@ -39,7 +39,8 @@ ElaNavigationBar::ElaNavigationBar(QWidget* parent)
     connect(d->_navigationView, &ElaNavigationView::navigationClicked, this, [=](const QModelIndex& index) { d->onTreeViewClicked(index); });
 
     d->_navigationSuggestBox = new ElaSuggestBox(this);
-    d->_navigationSuggestBox->setMaximumWidth(300);
+    d->_navigationSuggestBox->setMaximumWidth(0);
+    d->_navigationSuggestBox->setVisible(false);
     // 搜索跳转
     connect(d->_navigationSuggestBox, &ElaSuggestBox::suggestionClicked, this, [=](QString suggestText, QVariantMap suggestData) {
         ElaNavigationNode* node = nullptr;
@@ -65,6 +66,7 @@ ElaNavigationBar::ElaNavigationBar(QWidget* parent)
     d->_userCard->setCardPixmap(QPixmap(":/include/Image/Cirno.jpg"));
     d->_userCard->setTitle("Ela Tool");
     d->_userCard->setSubTitle("Liniyous@gmail.com");
+    d->_userCard->setVisible(false);
     connect(d->_userCard, &ElaInteractiveCard::clicked, this, &ElaNavigationBar::userInfoCardClicked);
 
     // 页脚
@@ -77,6 +79,7 @@ ElaNavigationBar::ElaNavigationBar(QWidget* parent)
     d->_footerDelegate = new ElaFooterDelegate(this);
     d->_footerDelegate->setElaListView(d->_footerView);
     d->_footerView->setItemDelegate(d->_footerDelegate);
+
     connect(d->_footerView, &ElaBaseListView::mousePress, this, [=](const QModelIndex& index) {
         d->_footerDelegate->setPressIndex(index);
         d->_footerView->viewport()->update();
@@ -473,7 +476,7 @@ void ElaNavigationBar::setDisplayMode(ElaNavigationType::NavigationDisplayMode d
         });
         navigationBarWidthAnimation->setEasingCurve(QEasingCurve::InOutSine);
         navigationBarWidthAnimation->setStartValue(width());
-        navigationBarWidthAnimation->setEndValue(300);
+        navigationBarWidthAnimation->setEndValue(190);
         navigationBarWidthAnimation->setDuration(isAnimation ? 300 : 0);
         navigationBarWidthAnimation->start(QAbstractAnimation::DeleteWhenStopped);
 
@@ -481,7 +484,7 @@ void ElaNavigationBar::setDisplayMode(ElaNavigationType::NavigationDisplayMode d
         {
             d->_mainLayout->takeAt(0);
         }
-        d->_maximalWidget->resize(300, height());
+        d->_maximalWidget->resize(190, height());
         d->_maximalWidget->setVisible(true);
         d->_startContentWidgetAnimation(d->_compactWidget->pos(), QPoint(300, d->_compactWidget->pos().y()), isAnimation);
         break;

@@ -56,3 +56,4 @@ compile_commands.json
 # CLion
 /.idea
 *.clang-format
+/build/Desktop_Qt_6_6_2_MinGW_64_bit-Release/src/elawidgettools_autogen

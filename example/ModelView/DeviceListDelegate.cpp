@@ -1,48 +1,64 @@
-﻿#include "DeviceListDelegate.h"
+﻿#include "devicelistdelegate.h"
+#include "QPushButton"
 
-#include <QPainter>
-#include <QPushButton>
-#include <QApplication>
-#include <QStyleOptionButton>
-
-DeviceListDelegate::DeviceListDelegate(QObject *parent)
-    : QStyledItemDelegate(parent)
-{
-}
-
-DeviceListDelegate::~DeviceListDelegate()
+DeviceListDelegate::DeviceListDelegate(QObject *parent) : QStyledItemDelegate(parent)
 {
 }
 
 void DeviceListDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    painter->save();
+    int buttonWidth = option.rect.width() / 2;
+    int buttonHeight = option.rect.height();
 
-    QRect rect = option.rect;
-    // 分割矩形区域来放置两个按钮
-    int halfWidth = rect.width() / 2;
-    rect.setWidth(halfWidth);
+    QStyleOptionButton buttonStyle1, buttonStyle2;
+    buttonStyle1.text = "Edit";
+    buttonStyle2.text = "Multicast";
 
-    // 绘制第一个按钮
-    QPushButton button1("Edit");
-    QStyleOptionButton opt1;
-    opt1.rect = rect.adjusted(5, 5, -5, -5); // 调整边距
-    opt1.state |= QStyle::State_Enabled;
-    QApplication::style()->drawControl(QStyle::CE_PushButton, &opt1, painter);
+    // 创建一个样式表字符串
+    QString buttonStyleSheet = "QPushButton {"
+                               "    color: #2472DD;"
+                               "    background-color: #E0E9F9;"
+                               "    border: 1px solid #2472DD;"
+                               "}";
+    buttonStyle1.rect = QRect(option.rect.x(), option.rect.y(), buttonWidth, buttonHeight);
+    buttonStyle1.state = QStyle::State_Enabled | QStyle::State_Raised;
 
-    // 移动矩形位置来绘制第二个按钮
-    rect.moveLeft(rect.right());
-    QPushButton button2("Multicast");
-    QStyleOptionButton opt2;
-    opt2.rect = rect.adjusted(5, 5, -5, -5); // 调整边距
-    opt2.state |= QStyle::State_Enabled;
-    QApplication::style()->drawControl(QStyle::CE_PushButton, &opt2, painter);
+    buttonStyle2.rect = QRect(option.rect.x() + buttonWidth, option.rect.y(), buttonWidth, buttonHeight);
+    buttonStyle2.state = QStyle::State_Enabled | QStyle::State_Raised;
 
-    painter->restore();
+    QPushButton button1, button2;
+    button1.style()->drawControl(QStyle::CE_PushButton, &buttonStyle1, painter, &button1);
+    button2.style()->drawControl(QStyle::CE_PushButton, &buttonStyle2, painter, &button2);
 }
 
-QSize DeviceListDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
+bool DeviceListDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index)
 {
-    // 返回一个合适的大小提示，这可能需要根据实际情况调整
-    return QSize(100, 30);
+    if (event->type() != QEvent::MouseButtonPress)
+        return QStyledItemDelegate::editorEvent(event, model, option, index);
+
+    QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
+    int buttonWidth = option.rect.width() / 2;
+
+    if (option.rect.contains(mouseEvent->pos()))
+    {
+        // 获取当前索引所在的行号
+        int row = index.row();
+
+        // 计算两个按钮的边界
+        QRect button1Rect = QRect(option.rect.x(), option.rect.y(), buttonWidth, option.rect.height());
+        QRect button2Rect = QRect(option.rect.x() + buttonWidth, option.rect.y(), buttonWidth, option.rect.height());
+
+        if (button1Rect.contains(mouseEvent->pos()))
+        {
+            emit button1Clicked(index);
+            qDebug() << "Button 1 of item at row" << row + 1 << "clicked";
+        }
+        else if (button2Rect.contains(mouseEvent->pos()))
+        {
+            emit button2Clicked(index);
+            qDebug() << "Button 2 of item at row" << row + 1 << "clicked";
+        }
+    }
+
+    return true;
 }

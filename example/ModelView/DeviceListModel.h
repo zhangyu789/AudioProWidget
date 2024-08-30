@@ -14,7 +14,8 @@ public:
 
     QVariant data(const QModelIndex& index, int role) const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
-
+    QString getNameFromModelIndex(const QModelIndex& index) const;
+    QString getTypeFromModelIndex(const QModelIndex& index) const;
 private:
     QStringList _header;
     QList<QStringList> _dataList;

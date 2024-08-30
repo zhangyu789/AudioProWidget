@@ -1,5 +1,7 @@
 #include "DeviceList.h"
 
+#include <QApplication>
+#include <QClipboard>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QTimer>
@@ -7,8 +9,10 @@
 
 
 #include "ElaTableView.h"
-
+#include "ElaMessageBar.h"
 #include "DeviceListModel.h"
+#include "DeviceListDelegate.h"
+#include "T_IconDelegate.h"
 
 DeviceList::DeviceList(QWidget* parent)
     : ElaScrollPage(parent)
@@ -18,10 +22,38 @@ DeviceList::DeviceList(QWidget* parent)
 
     //ElaTableView
     _tableView = new ElaTableView(this);
+    _deviceListModel = new DeviceListModel(this);
+    _deviceListDelegate = new DeviceListDelegate(this);
     QFont tableHeaderFont = _tableView->horizontalHeader()->font();
     tableHeaderFont.setPixelSize(16);
     _tableView->horizontalHeader()->setFont(tableHeaderFont);
-    _tableView->setModel(new DeviceListModel(this));
+    _tableView->setModel(_deviceListModel);
+        _iconDelegate = new T_IconDelegate(this);
+    // 设置最后一列为操作列，并为其设置自定义委托
+    // connect(_deviceListDelegate, &DeviceListDelegate::button1Clicked, this, &DeviceList::onButton1Clicked);
+    // connect(_deviceListDelegate, &DeviceListDelegate::button2Clicked, this, &DeviceList::onButton2Clicked);
+    connect(_deviceListDelegate, &DeviceListDelegate::button1Clicked, this, [=](const QModelIndex& index) {
+        QString deviceName = _deviceListModel->getNameFromModelIndex(index);
+        if (deviceName.isEmpty())
+        {
+            return;
+        }
+        qApp->clipboard()->setText(deviceName);
+        ElaMessageBar::success(ElaMessageBarType::Top, "复制完成", deviceName + "已被复制到剪贴板", 1000, this);
+    });
+    connect(_deviceListDelegate, &DeviceListDelegate::button2Clicked, this, [=](const QModelIndex& index) {
+        QString deviceType = _deviceListModel->getTypeFromModelIndex(index);
+        if (deviceType.isEmpty())
+        {
+            return;
+        }
+        qApp->clipboard()->setText(deviceType);
+        ElaMessageBar::success(ElaMessageBarType::Top, "复制完成", deviceType + "已被复制到剪贴板", 1000, this);
+    });
+    _tableView->setItemDelegateForColumn(_deviceListModel->columnCount() - 1, _deviceListDelegate);
+    // _tableView->installEventFilter(_deviceListDelegate);
+
+
     _tableView->setAlternatingRowColors(true);
     _tableView->verticalHeader()->setHidden(true);
     _tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
@@ -59,4 +91,33 @@ DeviceList::DeviceList(QWidget* parent)
 
 DeviceList::~DeviceList()
 {
+}
+
+void DeviceList::onButton1Clicked(const QModelIndex &index, const QString &buttonText)
+{
+    qDebug() << "Button clicked with text:" << buttonText;
+    if (buttonText == "Edit")
+    {
+        // 处理编辑逻辑
+        qDebug() << "Handling Edit button logic.";
+        ElaMessageBar::success(ElaMessageBarType::Top, "复制完成", buttonText + "已被复制到剪贴板", 1000, this);
+    }
+    else
+    {
+        qDebug() << "Unknown button text:" << buttonText;
+    }
+}
+void DeviceList::onButton2Clicked(const QModelIndex &index, const QString &buttonText)
+{
+    qDebug() << "Button clicked with text:" << buttonText;
+    if (buttonText == "Edit")
+    {
+        // 处理编辑逻辑
+        qDebug() << "Handling Edit button logic.";
+        ElaMessageBar::success(ElaMessageBarType::Top, "复制完成", buttonText + "已被复制到剪贴板", 1000, this);
+    }
+    else
+    {
+        qDebug() << "Unknown button text:" << buttonText;
+    }
 }

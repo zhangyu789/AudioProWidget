@@ -2,20 +2,22 @@
 #define DEVICELISTDELEGATE_H
 
 #include <QStyledItemDelegate>
+#include <QPushButton>
+#include <QMouseEvent>
 
 class DeviceListDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
+
 public:
     explicit DeviceListDelegate(QObject *parent = nullptr);
-    ~DeviceListDelegate();
 
-protected:
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
-    QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index) override;
 
-private:
-         // 可以在这里添加成员变量
+signals:
+    void button1Clicked(const QModelIndex &index);
+    void button2Clicked(const QModelIndex &index);
 };
 
 #endif // DEVICELISTDELEGATE_H

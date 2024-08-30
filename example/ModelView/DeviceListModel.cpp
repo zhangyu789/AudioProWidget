@@ -14,15 +14,15 @@ DeviceListModel::DeviceListModel(QObject* parent)
             << "Operate";
     // 初始化_dataList
     QStringList data0, data1, data2, data3, data4, data5, data6, data7, data8;
-    data0 << "Dante1" << "TX 2" << "44.1k" << "PCM 24" << "101" << "4.2.2.3" << "192.168.0.7" << "Edit";
-    data1 << "Dante2" << "TX 2" << "44.1k" << "PCM 24" << "101" << "4.2.2.3" << "192.168.67.99" << "Edit";
-    data2 << "Dante3" << "TX 2" << "44.1k" << "PCM 24" << "101" << "4.2.2.3" << "192.168.34.45" << "Edit";
-    data3 << "Dante4" << "TX 2" << "44.1k" << "PCM 24" << "101" << "4.2.2.3" << "192.168.12.23" << "Edit";
-    data4 << "Dante5" << "TX 2" << "44.1k" << "PCM 24" << "101" << "4.2.2.3" << "192.168.23.76" << "Edit";
-    data5 << "Dante6" << "TX 2" << "44.1k" << "PCM 24" << "101" << "4.2.2.3" << "192.168.75.72" << "Edit";
-    data6 << "Dante7" << "TX 2" << "44.1k" << "PCM 24" << "101" << "4.2.2.3" << "192.168.0.12" << "Edit";
-    data7 << "Dante8" << "TX 2" << "44.1k" << "PCM 24" << "101" << "4.2.2.3" << "192.168.66.76" << "Edit";
-    data8 << "Dante9" << "TX 2" << "44.1k" << "PCM 24" << "101" << "4.2.2.3" << "192.168.32.57" << "Edit";
+    data0 << "Dante1" << "TX 2" << "44.1k" << "PCM 24" << "101" << "4.2.2.3" << "192.168.0.7" ;
+    data1 << "Dante2" << "TX 2" << "44.1k" << "PCM 24" << "101" << "4.2.2.3" << "192.168.67.99" ;
+    data2 << "Dante3" << "TX 2" << "44.1k" << "PCM 24" << "101" << "4.2.2.3" << "192.168.34.45" ;
+    data3 << "Dante4" << "TX 2" << "44.1k" << "PCM 24" << "101" << "4.2.2.3" << "192.168.12.23" ;
+    data4 << "Dante5" << "TX 2" << "44.1k" << "PCM 24" << "101" << "4.2.2.3" << "192.168.23.76" ;
+    data5 << "Dante6" << "TX 2" << "44.1k" << "PCM 24" << "101" << "4.2.2.3" << "192.168.75.72" ;
+    data6 << "Dante7" << "TX 2" << "44.1k" << "PCM 24" << "101" << "4.2.2.3" << "192.168.0.12" ;
+    data7 << "Dante8" << "TX 2" << "44.1k" << "PCM 24" << "101" << "4.2.2.3" << "192.168.66.76" ;
+    data8 << "Dante9" << "TX 2" << "44.1k" << "PCM 24" << "101" << "4.2.2.3" << "192.168.32.57" ;
     _dataList.append(data0);
     _dataList.append(data1);
     _dataList.append(data2);
@@ -70,4 +70,26 @@ QVariant DeviceListModel::headerData(int section, Qt::Orientation orientation, i
         return _header[section];
     }
     return QAbstractTableModel::headerData(section, orientation, role);
+}
+QString DeviceListModel::getNameFromModelIndex(const QModelIndex& index) const
+{
+    QString deviceName;
+
+    if (index.row() < _dataList.count())
+    {
+        deviceName = _dataList.at(index.row()).at(0);
+    }
+
+    return deviceName;
+}
+QString DeviceListModel::getTypeFromModelIndex(const QModelIndex& index) const
+{
+    QString deviceType;
+
+    if (index.row() < _dataList.count())
+    {
+        deviceType = _dataList.at(index.row()).at(1);
+    }
+
+    return deviceType;
 }

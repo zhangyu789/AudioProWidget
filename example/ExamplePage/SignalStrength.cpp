@@ -14,6 +14,7 @@ SignalStrength::SignalStrength(QWidget* parent)
     : ElaScrollPage(parent)
 {
     setTitleVisible(false);
+    setContentsMargins(0, 0, 0, 0);
 
     //ElaTableView
     _tableView = new ElaTableView(this);
@@ -40,7 +41,7 @@ SignalStrength::SignalStrength(QWidget* parent)
 
 
     QWidget* centralWidget = new QWidget(this);
-    centralWidget->setWindowTitle("ElaView");
+    centralWidget->setWindowTitle("");
     QVBoxLayout* centerVLayout = new QVBoxLayout(centralWidget);
     centerVLayout->setContentsMargins(0, 0, 0, 0);
 

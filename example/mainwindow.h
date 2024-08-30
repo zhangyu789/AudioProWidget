@@ -5,14 +5,12 @@
 
 #include "ElaWindow.h"
 class T_Home;
-class DeviceList;
-class SignalStrength;
-class NetworkStatus;
+class DeviceView;
 class zone;
 class T_Icon;
 class T_ElaScreen;
 class T_BaseComponents;
-class T_TabWidget;
+class T_Navigation;
 class T_Popup;
 class T_Card;
 class T_View;
@@ -31,16 +29,15 @@ public:
 
 private:
     T_Home* _homePage{nullptr};
-    DeviceList* _device{nullptr};
-    SignalStrength* _signalStrength{nullptr};
-    NetworkStatus* _networkStatus{nullptr};
+    DeviceView* _deviceView{nullptr};
     zone* _zone{nullptr};
 #ifdef Q_OS_WIN
     T_ElaScreen* _elaScreenPage{nullptr};
 #endif
     T_Icon* _iconPage{nullptr};
     T_BaseComponents* _baseComponentsPage{nullptr};
-    T_TabWidget* _tabWidgetPage{nullptr};
+    T_Navigation* _navigationPage{nullptr};
+
     T_Popup* _popupPage{nullptr};
     T_Card* _cardPage{nullptr};
     T_View* _viewPage{nullptr};

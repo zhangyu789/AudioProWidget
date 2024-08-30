@@ -14,6 +14,7 @@ DeviceList::DeviceList(QWidget* parent)
     : ElaScrollPage(parent)
 {
     setTitleVisible(false);
+    setContentsMargins(0, 0, 0, 0);
 
     //ElaTableView
     _tableView = new ElaTableView(this);
@@ -22,13 +23,14 @@ DeviceList::DeviceList(QWidget* parent)
     _tableView->horizontalHeader()->setFont(tableHeaderFont);
     _tableView->setModel(new DeviceListModel(this));
     _tableView->setAlternatingRowColors(true);
-    _tableView->setIconSize(QSize(38, 38));
     _tableView->verticalHeader()->setHidden(true);
     _tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
     _tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     _tableView->horizontalHeader()->setMinimumSectionSize(60);
     _tableView->verticalHeader()->setMinimumSectionSize(46);
     _tableView->setFixedHeight(450);
+    // _tableView->setStyleSheet("QWidget { border: none; }");
+
     connect(_tableView, &ElaTableView::tableViewShow, this, [=]() {
         _tableView->setColumnWidth(0, 120);
         _tableView->setColumnWidth(1, 120);
@@ -44,7 +46,7 @@ DeviceList::DeviceList(QWidget* parent)
 
 
     QWidget* centralWidget = new QWidget(this);
-    centralWidget->setWindowTitle("ElaView");
+    centralWidget->setWindowTitle("");
     QVBoxLayout* centerVLayout = new QVBoxLayout(centralWidget);
     centerVLayout->setContentsMargins(0, 0, 0, 0);
 

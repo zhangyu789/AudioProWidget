@@ -29,14 +29,15 @@
 #include "ExamplePage/T_ElaScreen.h"
 #endif
 #include "ExamplePage/T_Home.h"
+#include "DeviceView.h"
 #include "zone.h"
 #include "DeviceList.h"
 #include "NetworkStatus.h"
 #include "SignalStrength.h"
 #include "ExamplePage/T_Icon.h"
 #include "ExamplePage/T_LogWidget.h"
+#include "ExamplePage/T_Navigation.h"
 #include "ExamplePage/T_Popup.h"
-#include "ExamplePage/T_TabWidget.h"
 #include "ExamplePage/T_UpdateWidget.h"
 MainWindow::MainWindow(QWidget* parent)
     : ElaWindow(parent)
@@ -208,12 +209,12 @@ void MainWindow::initContent()
 {
     _homePage = new T_Home(this);
     _zone = new zone(this);
-    _device = new DeviceList(this);
-    _signalStrength = new SignalStrength(this);
-    _networkStatus = new NetworkStatus(this);
+
+    _deviceView = new DeviceView(this);
     _iconPage = new T_Icon(this);
     _baseComponentsPage = new T_BaseComponents(this);
-    _tabWidgetPage = new T_TabWidget(this);
+    _navigationPage = new T_Navigation(this);
+
     _popupPage = new T_Popup(this);
     _cardPage = new T_Card(this);
     _viewPage = new T_View(this);
@@ -226,11 +227,7 @@ void MainWindow::initContent()
     addPageNode("Volume Schedule",new QWidget(), ElaIconType::CalendarDays);
     // addPageNode("Device View",_device, ElaIconType::SendBackward);
 
-    addExpanderNode("Device View", testKey_1, ElaIconType::SendBackward);
-    addPageNode("Device List", _device, testKey_1, ElaIconType::List);
-    addPageNode("Signal Strength", _signalStrength, testKey_1, ElaIconType::SignalBars);
-    addPageNode("Network Status", _networkStatus, testKey_1, ElaIconType::NetworkWired);
-
+    addPageNode("Device View", _deviceView, ElaIconType::SendBackward);
 
 
     addPageNode("HOME", _homePage, ElaIconType::House);
@@ -239,12 +236,13 @@ void MainWindow::initContent()
     addPageNode("View", _viewPage,ElaIconType::CameraViewfinder);
 
     addPageNode("Card", _cardPage, ElaIconType::Cards);
-    addPageNode("TabWidget", _tabWidgetPage,ElaIconType::Table);
+     addPageNode("ElaNavigation", _navigationPage, ElaIconType::Table);
     addPageNode("Popup", _popupPage, ElaIconType::Envelope);
     addPageNode("Icon", _iconPage, ElaIconType::FontAwesome);
 
 
     // addFooterNode("About", nullptr, _aboutKey, 0, ElaIconType::User);
+
     T_About* aboutPage = new T_About();
     aboutPage->hide();
     connect(this, &ElaWindow::navigationNodeClicked, this, [=](ElaNavigationType::NavigationNodeType nodeType, QString nodeKey) {

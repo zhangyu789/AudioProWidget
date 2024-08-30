@@ -18,6 +18,7 @@ DeviceView::DeviceView(QWidget* parent)
     _tabWidget->setTabsClosable(false);
     _tabWidget->setMovable(false);
     _tabWidget->setTabShape(QTabWidget::Rounded);
+    _tabWidget->setIsTabTransparent(true);
     // 自定义样式表
     QString styleSheet = "QTabBar::tab {"
                          "   background-color: #F2F6F9;"

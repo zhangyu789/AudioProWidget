@@ -30,8 +30,6 @@ DeviceList::DeviceList(QWidget* parent)
     _tableView->setModel(_deviceListModel);
         _iconDelegate = new T_IconDelegate(this);
     // 设置最后一列为操作列，并为其设置自定义委托
-    // connect(_deviceListDelegate, &DeviceListDelegate::button1Clicked, this, &DeviceList::onButton1Clicked);
-    // connect(_deviceListDelegate, &DeviceListDelegate::button2Clicked, this, &DeviceList::onButton2Clicked);
     connect(_deviceListDelegate, &DeviceListDelegate::button1Clicked, this, [=](const QModelIndex& index) {
         QString deviceName = _deviceListModel->getNameFromModelIndex(index);
         if (deviceName.isEmpty())

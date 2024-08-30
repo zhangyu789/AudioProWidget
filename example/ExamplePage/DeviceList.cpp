@@ -71,7 +71,7 @@ DeviceList::DeviceList(QWidget* parent)
         _tableView->setColumnWidth(4, 150);
         _tableView->setColumnWidth(5, 120);
         _tableView->setColumnWidth(6, 150);
-        _tableView->setColumnWidth(7, 80);
+        _tableView->setColumnWidth(7, 150);
     });
 
 

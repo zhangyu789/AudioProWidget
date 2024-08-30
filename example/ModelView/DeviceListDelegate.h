@@ -2,7 +2,7 @@
 #define DEVICELISTDELEGATE_H
 
 #include <QStyledItemDelegate>
-#include <QPushButton>
+#include <ElaPushButton.h>
 #include <QMouseEvent>
 
 class DeviceListDelegate : public QStyledItemDelegate

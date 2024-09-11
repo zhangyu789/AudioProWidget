@@ -6,6 +6,7 @@
 #include "ElaWindow.h"
 class T_Home;
 class DeviceView;
+class Routing;
 class zone;
 class T_Icon;
 class T_ElaScreen;
@@ -30,6 +31,7 @@ public:
 private:
     T_Home* _homePage{nullptr};
     DeviceView* _deviceView{nullptr};
+    Routing* _routing{nullptr};
     zone* _zone{nullptr};
 #ifdef Q_OS_WIN
     T_ElaScreen* _elaScreenPage{nullptr};

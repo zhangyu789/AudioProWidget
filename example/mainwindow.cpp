@@ -30,6 +30,7 @@
 #endif
 #include "ExamplePage/T_Home.h"
 #include "DeviceView.h"
+#include "Routing.h"
 #include "zone.h"
 #include "DeviceList.h"
 #include "NetworkStatus.h"
@@ -208,6 +209,7 @@ void MainWindow::initEdgeLayout()
 void MainWindow::initContent()
 {
     _homePage = new T_Home(this);
+    _routing = new Routing(this);
     _zone = new zone(this);
 
     _deviceView = new DeviceView(this);
@@ -221,7 +223,7 @@ void MainWindow::initContent()
 
     QString testKey_1;
 
-    addPageNode("Routing",new QWidget(), ElaIconType::Airplay);
+    addPageNode("Routing",_routing, ElaIconType::Airplay);
     addPageNode("Zone Volume", _zone, ElaIconType::Volume);
     addPageNode("Grouping",new QWidget(), ElaIconType::GroupArrowsRotate);
     addPageNode("Volume Schedule",new QWidget(), ElaIconType::CalendarDays);

@@ -8,7 +8,7 @@ ElaTabWidget::ElaTabWidget(QWidget* parent)
 {
     _pIsTabTransparent = false;
     setObjectName("ElaTabWidget");
-    setStyleSheet("#ElaTabWidget{background-color:transparent;}");
+    // setStyleSheet("#ElaTabWidget{background-color:transparent;}");
     setTabBar(new ElaTabBar(this));
 }
 

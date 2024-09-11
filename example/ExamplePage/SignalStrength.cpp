@@ -19,7 +19,7 @@ SignalStrength::SignalStrength(QWidget* parent)
     //ElaTableView
     _tableView = new ElaTableView(this);
     QFont tableHeaderFont = _tableView->horizontalHeader()->font();
-    tableHeaderFont.setPixelSize(16);
+    tableHeaderFont.setPixelSize(12);
     _tableView->horizontalHeader()->setFont(tableHeaderFont);
     _tableView->setModel(new SignalStrengthModel(this));
     _tableView->setAlternatingRowColors(true);
@@ -29,7 +29,7 @@ SignalStrength::SignalStrength(QWidget* parent)
     _tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     _tableView->horizontalHeader()->setMinimumSectionSize(60);
     _tableView->verticalHeader()->setMinimumSectionSize(46);
-    _tableView->setFixedHeight(450);
+    _tableView->setFixedHeight(550);
     connect(_tableView, &ElaTableView::tableViewShow, this, [=]() {
         _tableView->setColumnWidth(0, 150);
         _tableView->setColumnWidth(1, 250);

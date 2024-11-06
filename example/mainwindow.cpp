@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+﻿#include "mainwindow.h"
 
 #include <QDebug>
 #include <QGraphicsView>
@@ -29,12 +29,12 @@
 #include "ExamplePage/T_ElaScreen.h"
 #endif
 #include "ExamplePage/T_Home.h"
+#include "Scheduling.h"
 #include "DeviceView.h"
 #include "Routing.h"
 #include "zone.h"
-#include "DeviceList.h"
+#include "VolumeGroup.h"
 #include "NetworkStatus.h"
-#include "SignalStrength.h"
 #include "ExamplePage/T_Icon.h"
 #include "ExamplePage/T_LogWidget.h"
 #include "ExamplePage/T_Navigation.h"
@@ -212,6 +212,7 @@ void MainWindow::initContent()
     _routing = new Routing(this);
     _zone = new zone(this);
 
+    _scheduling = new Scheduling(this);
     _deviceView = new DeviceView(this);
     _iconPage = new T_Icon(this);
     _baseComponentsPage = new T_BaseComponents(this);
@@ -223,10 +224,13 @@ void MainWindow::initContent()
 
     QString testKey_1;
 
-    addPageNode("Routing",_routing, ElaIconType::Airplay);
+
+    addPageNode("Routing", _routing, ElaIconType::SwapArrows);
+
     addPageNode("Zone Volume", _zone, ElaIconType::Volume);
-    addPageNode("Grouping",new QWidget(), ElaIconType::GroupArrowsRotate);
-    addPageNode("Volume Schedule",new QWidget(), ElaIconType::CalendarDays);
+
+    addPageNode("Scheduling",_scheduling, ElaIconType::CalendarDays);
+
     // addPageNode("Device View",_device, ElaIconType::SendBackward);
 
     addPageNode("Device View", _deviceView, ElaIconType::SendBackward);

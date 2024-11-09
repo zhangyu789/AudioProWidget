@@ -10,6 +10,7 @@
 *.dll
 *.dylib
 
+
 # Qt-es
 object_script.*.Release
 object_script.*.Debug
@@ -57,3 +58,6 @@ compile_commands.json
 /.idea
 *.clang-format
 /build
+
+# Visual Studio
+.vs/

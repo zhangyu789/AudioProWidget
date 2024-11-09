@@ -21,6 +21,7 @@ class ELA_EXPORT ElaIconButton : public QPushButton
     Q_PROPERTY_CREATE_Q_H(bool, IsSelected);
 
 public:
+    ElaIconButton(QPixmap pix, QWidget* parent = nullptr);
     ElaIconButton(ElaIconType::IconName awesome, QWidget* parent = nullptr);
     ElaIconButton(ElaIconType::IconName awesome, int pixelSize, QWidget* parent = nullptr);
     ElaIconButton(ElaIconType::IconName awesome, int pixelSize, int fixedWidth, int fixedHeight, QWidget* parent = nullptr);
@@ -28,13 +29,10 @@ public:
     void setAwesome(ElaIconType::IconName awesome);
     ElaIconType::IconName getAwesome() const;
 
+    void setPixmap(QPixmap pix);
+
 protected:
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    virtual void enterEvent(QEnterEvent* event) override;
-#else
-    virtual void enterEvent(QEvent* event) override;
-#endif
-    virtual void leaveEvent(QEvent* event) override;
+    virtual bool event(QEvent* event) override;
     virtual void paintEvent(QPaintEvent* event) override;
 };
 

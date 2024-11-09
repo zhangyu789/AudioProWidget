@@ -13,9 +13,11 @@
 #include "ElaBaseListView.h"
 #include "ElaIcon.h"
 #include "ElaLineEdit.h"
+#include "ElaScrollBar.h"
 #include "ElaSuggestBoxSearchViewContainer.h"
 #include "ElaSuggestDelegate.h"
 #include "ElaSuggestModel.h"
+#include "ElaTheme.h"
 #include "private/ElaSuggestBoxPrivate.h"
 
 Q_PROPERTY_CREATE_Q_CPP(ElaSuggestBox, int, BorderRadius)
@@ -32,9 +34,25 @@ ElaSuggestBox::ElaSuggestBox(QWidget* parent)
     d->_searchEdit->setFixedHeight(35);
     d->_searchEdit->setPlaceholderText("查找功能");
     d->_searchEdit->setClearButtonEnabled(true);
-    QAction* searchAction = new QAction(ElaIcon::getInstance()->getElaIcon(ElaIconType::Fingerprint), "Search", this);
-    d->_searchEdit->addAction(searchAction, QLineEdit::TrailingPosition);
-    connect(searchAction, &QAction::triggered, this, [=](bool checked) {
+    d->_lightSearchAction = new QAction(ElaIcon::getInstance()->getElaIcon(ElaIconType::MagnifyingGlass), "Search", this);
+    d->_darkSearchAction = new QAction(ElaIcon::getInstance()->getElaIcon(ElaIconType::MagnifyingGlass, QColor(0xFF, 0xFF, 0xFF)), "Search", this);
+
+    d->_themeMode = eTheme->getThemeMode();
+    connect(eTheme, &ElaTheme::themeModeChanged, d, &ElaSuggestBoxPrivate::onThemeModeChanged);
+    if (d->_themeMode == ElaThemeType::Light)
+    {
+        d->_searchEdit->addAction(d->_lightSearchAction, QLineEdit::TrailingPosition);
+    }
+    else
+    {
+        d->_searchEdit->addAction(d->_darkSearchAction, QLineEdit::TrailingPosition);
+    }
+
+    connect(d->_lightSearchAction, &QAction::triggered, this, [=](bool checked) {
+        //qDebug() << "Search";
+    });
+
+    connect(d->_darkSearchAction, &QAction::triggered, this, [=](bool checked) {
         //qDebug() << "Search";
     });
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
@@ -45,6 +63,8 @@ ElaSuggestBox::ElaSuggestBox(QWidget* parent)
     d->_shadowLayout = new QVBoxLayout(d->_searchViewBaseWidget);
     d->_shadowLayout->setContentsMargins(0, 0, 0, 0);
     d->_searchView = new ElaBaseListView(d->_searchViewBaseWidget);
+    ElaScrollBar* floatVScrollBar = new ElaScrollBar(d->_searchView->verticalScrollBar(), d->_searchView);
+    floatVScrollBar->setIsAnimation(true);
     d->_searchViewBaseWidget->resize(292, 300);
     d->_shadowLayout->addWidget(d->_searchView);
     d->_searchModel = new ElaSuggestModel(this);

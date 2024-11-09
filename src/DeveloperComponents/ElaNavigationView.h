@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QTreeView>
 
+class ElaScrollBar;
 class ElaNavigationStyle;
 class ElaNavigationView : public QTreeView
 {
@@ -16,10 +17,11 @@ public:
     Q_SLOT void onCustomContextMenuRequested(const QPoint& pos);
 Q_SIGNALS:
     Q_SIGNAL void navigationClicked(const QModelIndex& index);
+    Q_SIGNAL void navigationOpenNewWindow(QString nodeKey);
 
 protected:
-    void mouseDoubleClickEvent(QMouseEvent* event) override;
-    void mouseReleaseEvent(QMouseEvent* event) override;
+    virtual void mouseDoubleClickEvent(QMouseEvent* event) override;
+    virtual void mouseReleaseEvent(QMouseEvent* event) override;
 
 private:
     ElaNavigationStyle* _navigationStyle{nullptr};

@@ -1,6 +1,6 @@
 #include "ElaWindowPrivate.h"
 
-#include <QImage>
+#include <QApplication>
 #include <QPropertyAnimation>
 #include <QTimer>
 #include <QVBoxLayout>
@@ -25,14 +25,14 @@ ElaWindowPrivate::~ElaWindowPrivate()
 
 void ElaWindowPrivate::onNavigationButtonClicked()
 {
-    int contentMargin = _contentsMargins;
     if (_isWMClickedAnimationFinished)
     {
+        _isNavigationDisplayModeChanged = false;
         _resetWindowLayout(true);
         _navigationBar->setIsTransparent(false);
         _navigationBar->setDisplayMode(ElaNavigationType::Maximal, false);
         _navigationBar->move(-_navigationBar->width(), _navigationBar->pos().y());
-        _navigationBar->resize(_navigationBar->width(), _centerStackedWidget->height());
+        _navigationBar->resize(_navigationBar->width(), _centerStackedWidget->height() + 1);
         QPropertyAnimation* navigationMoveAnimation = new QPropertyAnimation(_navigationBar, "pos");
         connect(navigationMoveAnimation, &QPropertyAnimation::finished, this, [=]() {
             _isNavigationBarExpanded = true;
@@ -40,7 +40,7 @@ void ElaWindowPrivate::onNavigationButtonClicked()
         navigationMoveAnimation->setEasingCurve(QEasingCurve::InOutSine);
         navigationMoveAnimation->setDuration(300);
         navigationMoveAnimation->setStartValue(_navigationBar->pos());
-        navigationMoveAnimation->setEndValue(QPoint(contentMargin, 0));
+        navigationMoveAnimation->setEndValue(QPoint(0, 0));
         navigationMoveAnimation->start(QAbstractAnimation::DeleteWhenStopped);
         _isWMClickedAnimationFinished = false;
     }
@@ -58,14 +58,26 @@ void ElaWindowPrivate::onWMWindowClickedEvent(QVariantMap data)
         if (_isNavigationBarExpanded)
         {
             QPropertyAnimation* navigationMoveAnimation = new QPropertyAnimation(_navigationBar, "pos");
+            connect(navigationMoveAnimation, &QPropertyAnimation::valueChanged, this, [=]() {
+                if (_isNavigationDisplayModeChanged)
+                {
+                    _navigationBar->setIsTransparent(true);
+                    _isWMClickedAnimationFinished = true;
+                    navigationMoveAnimation->deleteLater();
+                }
+            });
             connect(navigationMoveAnimation, &QPropertyAnimation::finished, this, [=]() {
                 _navigationBar->setIsTransparent(true);
+                if (!_isNavigationDisplayModeChanged)
+                {
+                    _navigationBar->setDisplayMode(ElaNavigationType::Minimal, false);
+                }
                 _isWMClickedAnimationFinished = true;
             });
             navigationMoveAnimation->setEasingCurve(QEasingCurve::InOutSine);
             navigationMoveAnimation->setDuration(300);
             navigationMoveAnimation->setStartValue(_navigationBar->pos());
-            navigationMoveAnimation->setEndValue(QPoint(-_navigationBar->width() - _contentsMargins, 0));
+            navigationMoveAnimation->setEndValue(QPoint(-_navigationBar->width(), 0));
             navigationMoveAnimation->start(QAbstractAnimation::DeleteWhenStopped);
             _isNavigationBarExpanded = false;
         }
@@ -89,14 +101,10 @@ void ElaWindowPrivate::onThemeReadyChange()
         _animationWidget->setOldWindowBackground(q->grab(q->rect()).toImage());
         if (eTheme->getThemeMode() == ElaThemeType::Light)
         {
-            _windowLinearGradient->setColorAt(0, ElaThemeColor(ElaThemeType::Dark, WindowBaseStart));
-            _windowLinearGradient->setColorAt(1, ElaThemeColor(ElaThemeType::Dark, WindowBaseEnd));
             eTheme->setThemeMode(ElaThemeType::Dark);
         }
         else
         {
-            _windowLinearGradient->setColorAt(0, ElaThemeColor(ElaThemeType::Light, WindowBaseStart));
-            _windowLinearGradient->setColorAt(1, ElaThemeColor(ElaThemeType::Light, WindowBaseEnd));
             eTheme->setThemeMode(ElaThemeType::Light);
         }
         _animationWidget->setNewWindowBackground(q->grab(q->rect()).toImage());
@@ -116,28 +124,30 @@ void ElaWindowPrivate::onThemeReadyChange()
 
 void ElaWindowPrivate::onDisplayModeChanged()
 {
+    _currentNavigationBarDisplayMode = _pNavigationBarDisplayMode;
     switch (_pNavigationBarDisplayMode)
     {
     case ElaNavigationType::Auto:
     {
         _appBar->setWindowButtonFlag(ElaAppBarType::NavigationButtonHint, false);
+        _doNavigationDisplayModeChange();
         break;
     }
     case ElaNavigationType::Minimal:
     {
-        _navigationBar->setDisplayMode(ElaNavigationType::Minimal, false);
+        _navigationBar->setDisplayMode(ElaNavigationType::Minimal, true);
         _appBar->setWindowButtonFlag(ElaAppBarType::NavigationButtonHint);
         break;
     }
     case ElaNavigationType::Compact:
     {
-        _navigationBar->setDisplayMode(ElaNavigationType::Compact, false);
+        _navigationBar->setDisplayMode(ElaNavigationType::Compact, true);
         _appBar->setWindowButtonFlag(ElaAppBarType::NavigationButtonHint, false);
         break;
     }
     case ElaNavigationType::Maximal:
     {
-        _navigationBar->setDisplayMode(ElaNavigationType::Maximal, false);
+        _navigationBar->setDisplayMode(ElaNavigationType::Maximal, true);
         _appBar->setWindowButtonFlag(ElaAppBarType::NavigationButtonHint, false);
         break;
     }
@@ -147,11 +157,13 @@ void ElaWindowPrivate::onDisplayModeChanged()
 void ElaWindowPrivate::onThemeModeChanged(ElaThemeType::ThemeMode themeMode)
 {
     Q_Q(ElaWindow);
-    _windowLinearGradient->setColorAt(0, ElaThemeColor(themeMode, WindowBaseStart));
-    _windowLinearGradient->setColorAt(1, ElaThemeColor(themeMode, WindowBaseEnd));
-    QPalette palette = q->palette();
-    palette.setBrush(QPalette::Window, *_windowLinearGradient);
-    q->setPalette(palette);
+    _themeMode = themeMode;
+    if (!eApp->getIsEnableMica())
+    {
+        QPalette palette = q->palette();
+        palette.setBrush(QPalette::Window, ElaThemeColor(_themeMode, WindowBase));
+        q->setPalette(palette);
+    }
 }
 
 void ElaWindowPrivate::onNavigationNodeClicked(ElaNavigationType::NavigationNodeType nodeType, QString nodeKey)
@@ -169,14 +181,14 @@ void ElaWindowPrivate::onNavigationNodeClicked(ElaNavigationType::NavigationNode
     _navigationTargetIndex = nodeIndex;
     QTimer::singleShot(180, this, [=]() {
         QWidget* currentWidget = _centerStackedWidget->widget(nodeIndex);
+        _centerStackedWidget->setCurrentIndex(nodeIndex);
         QPropertyAnimation* currentWidgetAnimation = new QPropertyAnimation(currentWidget, "pos");
-        currentWidgetAnimation->setEasingCurve(QEasingCurve::InOutCubic);
-        currentWidgetAnimation->setDuration(280);
+        currentWidgetAnimation->setEasingCurve(QEasingCurve::OutCubic);
+        currentWidgetAnimation->setDuration(300);
         QPoint currentWidgetPos = currentWidget->pos();
         currentWidgetAnimation->setEndValue(currentWidgetPos);
-        currentWidgetPos.setY(currentWidgetPos.y() + 60);
+        currentWidgetPos.setY(currentWidgetPos.y() + 80);
         currentWidgetAnimation->setStartValue(currentWidgetPos);
-        _centerStackedWidget->setCurrentIndex(nodeIndex);
         currentWidgetAnimation->start(QAbstractAnimation::DeleteWhenStopped); });
 }
 
@@ -229,7 +241,7 @@ void ElaWindowPrivate::_resetWindowLayout(bool isAnimation)
 void ElaWindowPrivate::_doNavigationDisplayModeChange()
 {
     Q_Q(ElaWindow);
-    if (eApp->getIsApplicationClosed() || !_isNavigationEnable || !_isInitFinished)
+    if (_isWindowClosing || !_isNavigationEnable || !_isInitFinished)
     {
         return;
     }
@@ -239,6 +251,7 @@ void ElaWindowPrivate::_doNavigationDisplayModeChange()
     }
     if (_pNavigationBarDisplayMode == ElaNavigationType::Auto)
     {
+        _isNavigationDisplayModeChanged = true;
         _resetWindowLayout(false);
         int width = q->centralWidget()->width();
         if (width >= 850 && _currentNavigationBarDisplayMode != ElaNavigationType::Maximal)

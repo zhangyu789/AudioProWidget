@@ -10,21 +10,23 @@
 #include "ElaContentDialog.h"
 #include "ElaDockWidget.h"
 #include "ElaEventBus.h"
-#include "ElaGraphicsItem.h"
-#include "ElaGraphicsScene.h"
-#include "ElaGraphicsView.h"
 #include "ElaLog.h"
 #include "ElaMenu.h"
 #include "ElaMenuBar.h"
 #include "ElaProgressBar.h"
 #include "ElaStatusBar.h"
 #include "ElaText.h"
+#include "ElaTheme.h"
 #include "ElaToolBar.h"
 #include "ElaToolButton.h"
 #include "T_About.h"
 #include "T_BaseComponents.h"
 #include "T_Card.h"
-#include "T_View.h"
+#include "T_Graphics.h"
+#include "T_ListView.h"
+#include "T_Setting.h"
+#include "T_TableView.h"
+#include "T_TreeView.h"
 #ifdef Q_OS_WIN
 #include "ExamplePage/T_ElaScreen.h"
 #endif
@@ -216,11 +218,11 @@ void MainWindow::initContent()
     _deviceView = new DeviceView(this);
     _iconPage = new T_Icon(this);
     _baseComponentsPage = new T_BaseComponents(this);
-    _navigationPage = new T_Navigation(this);
+    // _navigationPage = new T_Navigation(this);
 
-    _popupPage = new T_Popup(this);
-    _cardPage = new T_Card(this);
-    _viewPage = new T_View(this);
+    // _popupPage = new T_Popup(this);
+    // _cardPage = new T_Card(this);
+
 
     QString testKey_1;
 
@@ -239,7 +241,6 @@ void MainWindow::initContent()
     addPageNode("HOME", _homePage, ElaIconType::House);
     // navigation(elaScreenWidget->property("ElaPageKey").toString());
     addPageNode("BaseComponents", _baseComponentsPage, ElaIconType::CabinetFiling);
-    addPageNode("View", _viewPage,ElaIconType::CameraViewfinder);
 
     addPageNode("Card", _cardPage, ElaIconType::Cards);
      addPageNode("ElaNavigation", _navigationPage, ElaIconType::Table);

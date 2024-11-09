@@ -12,12 +12,18 @@ public:
     ~ElaCentralStackedWidget();
     Q_SLOT void onThemeModeChanged(ElaThemeType::ThemeMode themeMode);
 
+    void setIsTransparent(bool isTransparent);
+    bool getIsTransparent() const;
+
+    void setIsHasRadius(bool isHasRadius);
+
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
 
 private:
     ElaThemeType::ThemeMode _themeMode;
-    QLinearGradient* _windowLinearGradient{nullptr};
+    bool _isTransparent{false};
+    bool _isHasRadius{true};
 };
 
 #endif // ELACENTRALSTACKEDWIDGET_H

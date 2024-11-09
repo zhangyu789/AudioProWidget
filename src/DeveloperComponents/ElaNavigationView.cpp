@@ -8,10 +8,12 @@
 #include <QScrollBar>
 #include <QScroller>
 
+#include "ElaMenu.h"
 #include "ElaNavigationModel.h"
 #include "ElaNavigationNode.h"
 #include "ElaNavigationStyle.h"
 #include "ElaScrollBar.h"
+
 ElaNavigationView::ElaNavigationView(QWidget* parent)
     : QTreeView(parent)
 {
@@ -21,17 +23,22 @@ ElaNavigationView::ElaNavigationView(QWidget* parent)
     setHeaderHidden(true);
     setRootIsDecorated(false);
     setExpandsOnDoubleClick(false);
+    setAutoScroll(false);
     setMouseTracking(true);
     setSelectionMode(QAbstractItemView::NoSelection);
+
+    // 滚动条设置
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
     ElaScrollBar* vScrollBar = new ElaScrollBar(this);
-    vScrollBar->setisAnimation(true);
     connect(vScrollBar, &ElaScrollBar::rangeAnimationFinished, this, [=]() {
-        this->viewport()->update();
+        doItemsLayout();
     });
     setVerticalScrollBar(vScrollBar);
-    setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+    ElaScrollBar* floatVScrollBar = new ElaScrollBar(vScrollBar, this);
+    floatVScrollBar->setIsAnimation(true);
 
     _navigationStyle = new ElaNavigationStyle(this->style());
     _navigationStyle->setNavigationView(this);
@@ -83,7 +90,13 @@ void ElaNavigationView::onCustomContextMenuRequested(const QPoint& pos)
     ElaNavigationNode* posNode = static_cast<ElaNavigationNode*>(posIndex.internalPointer());
     if (!posNode->getIsExpanderNode())
     {
-        //qDebug() << posNode;
+        ElaMenu menu;
+        menu.setMenuItemHeight(27);
+        QAction* openAction = menu.addElaIconAction(ElaIconType::ObjectGroup, "在新窗口中打开");
+        connect(openAction, &QAction::triggered, this, [=]() {
+            Q_EMIT navigationOpenNewWindow(posNode->getNodeKey());
+        });
+        menu.exec(mapToGlobal(pos));
     }
 }
 

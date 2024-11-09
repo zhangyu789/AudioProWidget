@@ -100,6 +100,12 @@ void ElaDxgiManager::stopGrabScreen()
     d->_dxgi->setIsGrabActive(false);
 }
 
+bool ElaDxgiManager::getIsGrabScreen() const
+{
+    Q_D(const ElaDxgiManager);
+    return d->_dxgi->getIsGrabActive();
+}
+
 bool ElaDxgiManager::setDxDeviceID(int dxID)
 {
     Q_D(ElaDxgiManager);
@@ -176,7 +182,8 @@ void ElaDxgiManager::setGrabArea(int width, int height)
     {
         height = maxHeight;
     }
-    d->_dxgi->setGrabArea(QRect((maxWidth - width) / 2, (maxHeight - height) / 2, width, height));
+    d->_dxgi->setIsGrabCenter(true);
+    d->_dxgi->setGrabArea(QRect(0, 0, width, height));
 }
 
 void ElaDxgiManager::setGrabArea(int x, int y, int width, int height)
@@ -192,6 +199,7 @@ void ElaDxgiManager::setGrabArea(int x, int y, int width, int height)
     {
         height = maxHeight;
     }
+    d->_dxgi->setIsGrabCenter(false);
     d->_dxgi->setGrabArea(QRect(x, y, width, height));
 }
 
@@ -255,13 +263,16 @@ ElaDxgiScreen::~ElaDxgiScreen()
 void ElaDxgiScreen::paintEvent(QPaintEvent* event)
 {
     Q_D(ElaDxgiScreen);
-    QPainter painter(this);
-    painter.save();
-    painter.setRenderHints(QPainter::SmoothPixmapTransform | QPainter::Antialiasing);
-    QPainterPath path;
-    path.addRoundedRect(rect(), d->_pBorderRadius, d->_pBorderRadius);
-    painter.drawImage(rect(), d->_dxgiManager->grabScreenToImage());
-    painter.restore();
+    if (d->_dxgiManager->getIsGrabScreen())
+    {
+        QPainter painter(this);
+        painter.save();
+        painter.setRenderHints(QPainter::SmoothPixmapTransform | QPainter::Antialiasing);
+        QPainterPath path;
+        path.addRoundedRect(rect(), d->_pBorderRadius, d->_pBorderRadius);
+        painter.drawImage(rect(), d->_dxgiManager->grabScreenToImage());
+        painter.restore();
+    }
 }
 
 void ElaDxgiScreen::setIsSyncGrabSize(bool isSyncGrabSize)

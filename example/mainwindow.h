@@ -4,6 +4,7 @@
 #include <QMainWindow>
 
 #include "ElaWindow.h"
+#include "RoutingWidget.h"
 class T_Home;
 class DeviceView;
 class Scheduling;
@@ -39,7 +40,9 @@ private:
     Scheduling* _scheduling{nullptr};
     DeviceView* _deviceView{nullptr};
     Routing* _routing{nullptr};
+    std::shared_ptr<RoutingWidget> _routingWidget{nullptr};
     zone* _zone{nullptr};
+
 #ifdef Q_OS_WIN
     T_ElaScreen* _elaScreenPage{nullptr};
 #endif

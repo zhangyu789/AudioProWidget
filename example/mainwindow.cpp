@@ -1,5 +1,5 @@
 ﻿#include "mainwindow.h"
-
+#include "RoutingWidget.h"
 #include <QDebug>
 #include <QGraphicsView>
 #include <QHBoxLayout>
@@ -212,6 +212,9 @@ void MainWindow::initContent()
 {
     _homePage = new T_Home(this);
     _routing = new Routing(this);
+
+    _routingWidget = std::make_shared <RoutingWidget>(this);
+
     _zone = new zone(this);
 
     _scheduling = new Scheduling(this);
@@ -229,6 +232,7 @@ void MainWindow::initContent()
 
     addPageNode("Routing", _routing, ElaIconType::SwapArrows);
 
+    addPageNode("Routing",_routingWidget.get(), ElaIconType::SendBackward);
     addPageNode("Zone Volume", _zone, ElaIconType::Volume);
 
     addPageNode("Scheduling",_scheduling, ElaIconType::CalendarDays);

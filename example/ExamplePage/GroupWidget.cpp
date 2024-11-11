@@ -1,5 +1,5 @@
 ﻿#include "GroupWidget.h"
-#include <QLabel>
+
 GroupWidget::GroupWidget(QWidget *parent)
     : QWidget(parent),
     _mainLayout(new QVBoxLayout(this))
@@ -15,12 +15,28 @@ void GroupWidget::addGroup(const QString& groupName) {
     QGroupBox* groupBox = new QGroupBox(groupName, this);
     QVBoxLayout* groupLayout = new QVBoxLayout(groupBox);
 
+    // 创建 TX2 区域的标签并添加
+    QLabel* txLabel = new QLabel("TX 2", this);
+    txLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    txLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+    groupLayout->addWidget(txLabel);
+
     // 创建两个区域布局：TX2 区域和 Zone 区域
     QHBoxLayout* txListLayout = new QHBoxLayout;
     QVBoxLayout* zoneListLayout = new QVBoxLayout;
 
+    // 设置 TX2 和 Zone 区域的对齐方式，确保按钮不会拉伸
+    txListLayout->setAlignment(Qt::AlignLeft);
+    zoneListLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+
     // 将这两个布局添加到 Group 的总体布局中
     groupLayout->addLayout(txListLayout);
+
+    // 创建 TX2 区域的标签并添加
+    QLabel* zoneLabel = new QLabel("Zone", this);
+    zoneLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    zoneLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+    groupLayout->addWidget(zoneLabel);
     groupLayout->addLayout(zoneListLayout);
 
     // 将 Group 添加到主布局中
@@ -44,6 +60,9 @@ void GroupWidget::addTx2(const QString& txName, const QString& groupName) {
     QPushButton* txButton = new QPushButton(txName);
     txButton->setCheckable(true);
 
+    // 设置按钮的大小策略为 Fixed，以防止它拉伸
+    txButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
     // 将 TX2 按钮添加到 TX2 区域布局中
     _txListLayouts[groupName]->addWidget(txButton);
 
@@ -65,6 +84,9 @@ void GroupWidget::addZone(const QString& zoneName, const QString& txName, const 
     zoneButton->setCheckable(true);
     zoneButton->setVisible(false);
 
+    // 设置按钮的大小策略为 Fixed
+    zoneButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
     QString key = groupName + "|" + txName;
 
     // 检查是否需要为此 TX2 设备创建一个新的行布局
@@ -75,6 +97,9 @@ void GroupWidget::addZone(const QString& zoneName, const QString& txName, const 
         // 在 Zone 列表前添加 TX2 的名称
         QLabel* txLabel = new QLabel(txName, this);
         zoneRowLayout->addWidget(txLabel);
+
+        // 设置 Zone 行的对齐方式
+        zoneRowLayout->setAlignment(Qt::AlignLeft);
 
         // 将此行布局添加到 Zone 区域布局中
         _zoneListLayouts[groupName]->addLayout(zoneRowLayout);

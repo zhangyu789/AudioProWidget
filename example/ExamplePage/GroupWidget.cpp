@@ -18,25 +18,26 @@ void GroupWidget::addGroup(const QString& groupName) {
     // 创建 TX2 区域的标签并添加
     QLabel* txLabel = new QLabel("TX 2", this);
     txLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    txLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+    txLabel->setAlignment(Qt::AlignLeft | Qt::AlignTop); // 左上对齐
     groupLayout->addWidget(txLabel);
 
-    // 创建两个区域布局：TX2 区域和 Zone 区域
+    // 创建区域布局：TX2 区域
+    // 设置 TX2 区域的对齐方式
     QHBoxLayout* txListLayout = new QHBoxLayout;
-    QVBoxLayout* zoneListLayout = new QVBoxLayout;
-
-    // 设置 TX2 和 Zone 区域的对齐方式，确保按钮不会拉伸
-    txListLayout->setAlignment(Qt::AlignLeft);
-    zoneListLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
-
-    // 将这两个布局添加到 Group 的总体布局中
+    txListLayout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+    // 将TX2添加到 Group 的总体布局中
     groupLayout->addLayout(txListLayout);
 
-    // 创建 TX2 区域的标签并添加
+    // 创建 zone 区域的标签并添加
     QLabel* zoneLabel = new QLabel("Zone", this);
     zoneLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    zoneLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+    zoneLabel->setAlignment(Qt::AlignLeft | Qt::AlignTop); // 左上对齐
     groupLayout->addWidget(zoneLabel);
+    // 创建区域布局： Zone 区域
+    // 设置 Zone 区域的对齐方式
+    QVBoxLayout* zoneListLayout = new QVBoxLayout;
+    zoneListLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+    // 将Zone添加到 Group 的总体布局中
     groupLayout->addLayout(zoneListLayout);
 
     // 将 Group 添加到主布局中
@@ -67,10 +68,35 @@ void GroupWidget::addTx2(const QString& txName, const QString& groupName) {
     _txListLayouts[groupName]->addWidget(txButton);
 
     connect(txButton, &QPushButton::toggled, this, [=](bool checked) {
-        // 切换该 TX2 下所有 Zone 的可见性
+        // 切换该 TX2 下所有 Zone 的可见性和对应设备名称的显示状态
         QString key = groupName + "|" + txName;
-        for (auto* zoneButton : _zoneButtons[key]) {
-            zoneButton->setVisible(checked);
+
+        if (checked) {
+            // 如果还没有显示对应的设备名称标签，创建它并添加到布局
+            if (!_txLabels.contains(key)) {
+                QLabel* txLabel = new QLabel(txName, this);
+                txLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+                _txLabels[key] = txLabel;
+                QHBoxLayout* zoneRowLayout = new QHBoxLayout;
+                zoneRowLayout->addWidget(txLabel);
+                zoneRowLayout->setAlignment(Qt::AlignLeft);
+
+                _zoneListLayouts[groupName]->addLayout(zoneRowLayout);
+            }
+
+            // 显示 Zone 按钮和 TX2 标签
+            for (auto* zoneButton : _zoneButtons[key]) {
+                zoneButton->setVisible(true);
+            }
+            _txLabels[key]->setVisible(true);
+        } else {
+            // 隐藏 Zone 按钮和 TX2 标签
+            for (auto* zoneButton : _zoneButtons[key]) {
+                zoneButton->setVisible(false);
+            }
+            if (_txLabels.contains(key)) {
+                _txLabels[key]->setVisible(false);
+            }
         }
     });
 }
@@ -94,8 +120,10 @@ void GroupWidget::addZone(const QString& zoneName, const QString& txName, const 
         // 创建一个新的行布局用于显示 TX2 设备的名称和其 Zone 列表
         QHBoxLayout* zoneRowLayout = new QHBoxLayout;
 
-        // 在 Zone 列表前添加 TX2 的名称
+        // 添加占位标签，将设备名称推迟到按钮显示时创建
         QLabel* txLabel = new QLabel(txName, this);
+        txLabel->setVisible(false);  // 默认隐藏
+        _txLabels[key] = txLabel;
         zoneRowLayout->addWidget(txLabel);
 
         // 设置 Zone 行的对齐方式

@@ -34,10 +34,14 @@ Routing::Routing(QWidget* parent)
 
 
 
-
+    // 设置整个表格控件的固定高度
+    // matrixTable->setFixedHeight(800); // 设置高度为400，可根据需要调整
 
 
     matrixTable->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    // 根据内容计算表格高度并设置
+    adjustTableHeight(matrixTable);
     // 创建一个水平布局来容纳过滤器部分和矩阵表格
     QVBoxLayout *mainContentLayout = new QVBoxLayout;
     mainContentLayout->addWidget(filterGroupBox);
@@ -54,7 +58,24 @@ Routing::Routing(QWidget* parent)
     // 将中心部件添加到 ElaScrollPage
     addCentralWidget(centralWidget, true, true, 0);
 }
+void Routing::adjustTableHeight(QTableWidget* table) {
+    int totalHeight = 0;
 
+    // 计算每一行的高度
+    for (int row = 0; row < table->rowCount(); ++row) {
+        totalHeight += table->rowHeight(row);
+    }
+
+    // 加上表头的高度
+    totalHeight += table->horizontalHeader()->height();
+
+    // 加上表格的边框或其他额外空间的高度
+    int extraHeight = 4;  // 额外高度，用于边框或间隙，可以根据需要调整
+    totalHeight += extraHeight;
+
+    // 设置表格控件的高度
+    table->setFixedHeight(totalHeight+20);
+}
 QGroupBox* Routing::createFilterGroup() {
     // 创建过滤器组
     QGroupBox *filterGroup = new QGroupBox("Filter");

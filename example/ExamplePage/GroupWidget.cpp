@@ -1,5 +1,5 @@
 ﻿#include "GroupWidget.h"
-
+#include <QLabel>
 GroupWidget::GroupWidget(QWidget *parent)
     : QWidget(parent),
     _mainLayout(new QVBoxLayout(this))
@@ -15,14 +15,22 @@ void GroupWidget::addGroup(const QString& groupName) {
     QGroupBox* groupBox = new QGroupBox(groupName, this);
     QVBoxLayout* groupLayout = new QVBoxLayout(groupBox);
 
+    // 创建两个区域布局：TX2 区域和 Zone 区域
+    QHBoxLayout* txListLayout = new QHBoxLayout;
+    QVBoxLayout* zoneListLayout = new QVBoxLayout;
+
+    // 将这两个布局添加到 Group 的总体布局中
+    groupLayout->addLayout(txListLayout);
+    groupLayout->addLayout(zoneListLayout);
+
     // 将 Group 添加到主布局中
     _mainLayout->addWidget(groupBox);
-    _groups[groupName] = groupBox; // 存储 Group Box 以便后续查找
+    _groups[groupName] = groupBox;
 
-    // 初始化该 Group 的 TX2 布局映射
-    _txLayouts[groupName] = QMap<QString, QHBoxLayout*>();
+    // 记录 Group 的 TX2 和 Zone 区域布局
+    _txListLayouts[groupName] = txListLayout;
+    _zoneListLayouts[groupName] = zoneListLayout;
 
-    // 设置 groupBox 的布局
     groupBox->setLayout(groupLayout);
 }
 
@@ -36,18 +44,8 @@ void GroupWidget::addTx2(const QString& txName, const QString& groupName) {
     QPushButton* txButton = new QPushButton(txName);
     txButton->setCheckable(true);
 
-    // 创建 TX2 的布局
-    QHBoxLayout* txLayout = new QHBoxLayout;
-    txLayout->addWidget(txButton);
-
-    // 获取 Group 的布局
-    QVBoxLayout* groupLayout = qobject_cast<QVBoxLayout*>(_groups[groupName]->layout());
-    if (groupLayout) {
-        groupLayout->addLayout(txLayout);  // 将 TX2 布局添加到 Group 的布局中
-    }
-
-    // 保存 TX2 布局
-    _txLayouts[groupName][txName] = txLayout;
+    // 将 TX2 按钮添加到 TX2 区域布局中
+    _txListLayouts[groupName]->addWidget(txButton);
 
     connect(txButton, &QPushButton::toggled, this, [=](bool checked) {
         // 切换该 TX2 下所有 Zone 的可见性
@@ -60,14 +58,29 @@ void GroupWidget::addTx2(const QString& txName, const QString& groupName) {
 
 void GroupWidget::addZone(const QString& zoneName, const QString& txName, const QString& groupName) {
     // 检查 Group 和 TX2 是否存在
-    if (!_txLayouts.contains(groupName) || !_txLayouts[groupName].contains(txName)) return;
+    if (!_groups.contains(groupName) || !_txListLayouts[groupName]) return;
 
-    // 创建 Zone 按钮并添加到对应的 TX2 布局中
+    // 创建 Zone 按钮并设置为隐藏
     QPushButton* zoneButton = new QPushButton(zoneName);
     zoneButton->setCheckable(true);
-    zoneButton->setVisible(false); // 默认隐藏
+    zoneButton->setVisible(false);
 
     QString key = groupName + "|" + txName;
-    _txLayouts[groupName][txName]->addWidget(zoneButton); // 添加到 TX2 布局中
-    _zoneButtons[key].append(zoneButton); // 存储 Zone 按钮以便管理
+
+    // 检查是否需要为此 TX2 设备创建一个新的行布局
+    if (_zoneButtons[key].isEmpty()) {
+        // 创建一个新的行布局用于显示 TX2 设备的名称和其 Zone 列表
+        QHBoxLayout* zoneRowLayout = new QHBoxLayout;
+
+        // 在 Zone 列表前添加 TX2 的名称
+        QLabel* txLabel = new QLabel(txName, this);
+        zoneRowLayout->addWidget(txLabel);
+
+        // 将此行布局添加到 Zone 区域布局中
+        _zoneListLayouts[groupName]->addLayout(zoneRowLayout);
+    }
+
+    // 将 Zone 按钮添加到对应的 TX2 行布局中
+    _zoneButtons[key].append(zoneButton);
+    _zoneListLayouts[groupName]->itemAt(_zoneListLayouts[groupName]->count() - 1)->layout()->addWidget(zoneButton);
 }

@@ -4,10 +4,12 @@
 DECTListModel::DECTListModel(QObject* parent)
     : QAbstractTableModel{parent}
 {
-    _header << "No."
-            << "RX"
-            << "Speaker Status"
-            << "Signal Strength";
+    _header << "Device Name"
+            << "Connected to:"
+            << "Firmware version"
+            << "Signal history [% over 24h]"
+            << "Signal Strength"
+            << "Status";
     // 初始化_dataList
     QStringList data0, data1, data2, data3, data4, data5, data6, data7, data8;
     data0 << "1" << "RX DECT 01" << "Online" << "99";

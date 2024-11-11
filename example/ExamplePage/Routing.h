@@ -1,10 +1,14 @@
-#ifndef ROUTING_H
+﻿#ifndef ROUTING_H
 #define ROUTING_H
+
 #include "ElaScrollPage.h"
+#include <QGroupBox>
+#include <QTableWidget>
 
 class QWebEngineView;
 class ElaComboBox;
 class ElaSlider;
+
 class Routing : public ElaScrollPage
 {
     Q_OBJECT
@@ -12,16 +16,17 @@ public:
     explicit Routing(QWidget* parent = nullptr);
 
 private:
-    QWebEngineView* _webEngineView{nullptr};
+
+    // 新增私有成员变量，用于过滤器和矩阵表格
+    QGroupBox* filterGroupBox{nullptr};
+    QTableWidget* matrixTable{nullptr};
+
+    // 用于初始化过滤器和矩阵表格的方法
+    QGroupBox* createFilterGroup();
+    QTableWidget* createMatrixTable();
 
 Q_SIGNALS:
-    Q_SIGNAL void elaScreenNavigation();
-    Q_SIGNAL void elaBaseComponentNavigation();
-    Q_SIGNAL void elaSceneNavigation();
-    Q_SIGNAL void elaCardNavigation();
-    Q_SIGNAL void elaIconNavigation();
 
 };
-
 
 #endif // ROUTING_H

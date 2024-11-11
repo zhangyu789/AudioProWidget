@@ -27,6 +27,16 @@ Routing::Routing(QWidget* parent)
 
     // 初始化矩阵表格
     matrixTable = createMatrixTable();
+    matrixTable->setShowGrid(false);  // 隐藏网格线
+
+    // 使用样式表仅隐藏内部的网格线，而保留外边框
+    matrixTable->setStyleSheet("QTableWidget {border: 1px solid black;}");
+
+
+
+
+
+
     matrixTable->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     // 创建一个水平布局来容纳过滤器部分和矩阵表格
     QVBoxLayout *mainContentLayout = new QVBoxLayout;
@@ -69,11 +79,11 @@ QTableWidget* Routing::createMatrixTable() {
     QTableWidget *table = new QTableWidget(rows, columns);
 
     // 用于跟踪每个父级是否被展开的状态
-    QVector<bool> parentExpanded(parentCount, true);
+    QMap<int, bool> parentExpanded;  // 改为使用 QMap
 
     int currentRow = 0, currentColumn = 0;
     int childCellSize = 25;  // 设置子级单元格大小，使其成为正方形
-    int parentCellSize = 50;  // 设置子级单元格大小，使其成为正方形
+    int parentCellSize = 50;  // 设置父级单元格大小，使其成为正方形
 
     // 遍历每个父级
     for (int p = 0; p < parentCount; ++p) {
@@ -110,8 +120,9 @@ QTableWidget* Routing::createMatrixTable() {
         }
 
         // 设置父级行和列的高度和宽度不同于子级，使其视觉上更明显
-        table->setRowHeight(currentRow, parentCellSize);  // 父级行高度
-        table->setColumnWidth(currentColumn, parentCellSize);  // 父级列宽度
+        // table->setRowHeight(currentRow, parentCellSize);  // 父级行高度
+        // table->setColumnWidth(currentColumn, parentCellSize);  // 父级列宽度
+        table->resizeColumnToContents(currentColumn);
 
         // 隐藏父级单元格的交互
         QTableWidgetItem *parentItem = new QTableWidgetItem("");
@@ -119,8 +130,10 @@ QTableWidget* Routing::createMatrixTable() {
         table->setItem(currentRow, currentColumn, parentItem);
 
         // 连接父级标签的点击事件，控制子级显示/隐藏
-        connect(table->verticalHeader(), &QHeaderView::sectionClicked, this, [=, &parentExpanded]() mutable {
-            if (parentExpanded[p]) {
+        connect(table->verticalHeader(), &QHeaderView::sectionDoubleClicked, this, [=, &parentExpanded]() {
+            bool isExpanded = parentExpanded.value(p, true);  // 获取当前父级是否展开的状态
+
+            if (isExpanded) {
                 for (int i = 1; i <= childrenPerParent; ++i) {
                     table->hideRow(currentRow + i);
                 }
@@ -129,10 +142,12 @@ QTableWidget* Routing::createMatrixTable() {
                     table->showRow(currentRow + i);
                 }
             }
-            parentExpanded[p] = !parentExpanded[p];
+            parentExpanded[p] = !isExpanded;  // 切换父级的展开状态
         });
-        connect(table->horizontalHeader(), &QHeaderView::sectionClicked, this, [=, &parentExpanded]() mutable {
-            if (parentExpanded[p]) {
+        connect(table->horizontalHeader(), &QHeaderView::sectionDoubleClicked, this, [=, &parentExpanded]() {
+            bool isExpanded = parentExpanded.value(p, true);  // 获取当前父级是否展开的状态
+
+            if (isExpanded) {
                 for (int i = 1; i <= childrenPerParent; ++i) {
                     table->hideColumn(currentColumn + i);
                 }
@@ -141,8 +156,10 @@ QTableWidget* Routing::createMatrixTable() {
                     table->showColumn(currentColumn + i);
                 }
             }
-            parentExpanded[p] = !parentExpanded[p];
+
+            parentExpanded[p] = !isExpanded;  // 切换父级的展开状态
         });
+
 
         // 更新当前行和列索引
         currentRow += childrenPerParent + 1;
@@ -169,3 +186,4 @@ QTableWidget* Routing::createMatrixTable() {
 
     return table;
 }
+

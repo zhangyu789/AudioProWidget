@@ -4,6 +4,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QCheckBox>
+#include <ElaCheckBox.h>
 #include <QTableWidget>
 #include <QTableWidgetItem>
 #include <QGroupBox>
@@ -26,9 +27,9 @@ Routing::Routing(QWidget* parent)
 
     // 初始化矩阵表格
     matrixTable = createMatrixTable();
-
+    matrixTable->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     // 创建一个水平布局来容纳过滤器部分和矩阵表格
-    QHBoxLayout *mainContentLayout = new QHBoxLayout;
+    QVBoxLayout *mainContentLayout = new QVBoxLayout;
     mainContentLayout->addWidget(filterGroupBox);
     mainContentLayout->addWidget(matrixTable);
 
@@ -50,8 +51,8 @@ QGroupBox* Routing::createFilterGroup() {
     QVBoxLayout *filterLayout = new QVBoxLayout;
 
     // 添加 Transmitter 和 Receivers 复选框
-    QCheckBox *transmitterCheckBox = new QCheckBox("Transmitter");
-    QCheckBox *receiversCheckBox = new QCheckBox("Receivers");
+    ElaCheckBox *transmitterCheckBox = new ElaCheckBox("Transmitter");
+    ElaCheckBox *receiversCheckBox = new ElaCheckBox("Receivers");
     filterLayout->addWidget(transmitterCheckBox);
     filterLayout->addWidget(receiversCheckBox);
 
@@ -71,7 +72,8 @@ QTableWidget* Routing::createMatrixTable() {
     QVector<bool> parentExpanded(parentCount, true);
 
     int currentRow = 0, currentColumn = 0;
-    int childCellSize = 40;  // 设置子级单元格大小，使其成为正方形
+    int childCellSize = 25;  // 设置子级单元格大小，使其成为正方形
+    int parentCellSize = 50;  // 设置子级单元格大小，使其成为正方形
 
     // 遍历每个父级
     for (int p = 0; p < parentCount; ++p) {
@@ -108,8 +110,8 @@ QTableWidget* Routing::createMatrixTable() {
         }
 
         // 设置父级行和列的高度和宽度不同于子级，使其视觉上更明显
-        table->setRowHeight(currentRow, childCellSize);  // 父级行高度
-        table->setColumnWidth(currentColumn, childCellSize);  // 父级列宽度
+        table->setRowHeight(currentRow, parentCellSize);  // 父级行高度
+        table->setColumnWidth(currentColumn, parentCellSize);  // 父级列宽度
 
         // 隐藏父级单元格的交互
         QTableWidgetItem *parentItem = new QTableWidgetItem("");

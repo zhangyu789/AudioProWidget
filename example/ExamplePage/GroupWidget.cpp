@@ -13,6 +13,11 @@ void GroupWidget::addGroup(const QString& groupName) {
 
     // 创建 Group 的 QGroupBox
     QGroupBox* groupBox = new QGroupBox(groupName, this);
+    // Set horizontal size policy to Expanding, vertical to Fixed
+    groupBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    // Set the maximum width to be half the parent container width
+    groupBox->setMaximumWidth(parentWidget()->width() / 2);
+
     QVBoxLayout* groupLayout = new QVBoxLayout(groupBox);
 
     // 创建 TX2 区域的标签并添加

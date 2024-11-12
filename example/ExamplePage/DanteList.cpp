@@ -43,7 +43,8 @@ DanteList::DanteList(QWidget* parent)
         ElaMessageBar::success(ElaMessageBarType::Top, "复制完成", deviceName + "已被复制到剪贴板", 1000, this);
 
 
-        dialog->setFixedSize(400, 400);
+        dialog->setFixedSize(500, 400);
+        dialog->setIsFixedSize(true);
         dialog->moveToCenter();
         dialog->show();
 

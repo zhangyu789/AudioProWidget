@@ -100,7 +100,7 @@ QTableWidget* Routing::createMatrixTable() {
     QTableWidget *table = new QTableWidget(rows, columns);
 
     // 用于跟踪每个父级是否被展开的状态
-    QMap<int, bool> parentExpanded;  // 改为使用 QMap
+    QMap<int, bool>* pParentExpanded = new QMap<int, bool>;  // 改为使用 QMap
 
     int currentRow = 0, currentColumn = 0;
     int childCellSize = 25;  // 设置子级单元格大小，使其成为正方形
@@ -108,6 +108,7 @@ QTableWidget* Routing::createMatrixTable() {
 
     // 遍历每个父级
     for (int p = 0; p < parentCount; ++p) {
+        (*pParentExpanded)[p] = true;
         QString parentLabel = QString("Dante%1").arg(p + 1);
 
         // 创建父级行/列的标签
@@ -151,8 +152,8 @@ QTableWidget* Routing::createMatrixTable() {
         table->setItem(currentRow, currentColumn, parentItem);
 
         // 连接父级标签的点击事件，控制子级显示/隐藏
-        connect(table->verticalHeader(), &QHeaderView::sectionDoubleClicked, this, [=, &parentExpanded]() {
-            bool isExpanded = parentExpanded.value(p, true);  // 获取当前父级是否展开的状态
+        connect(table->verticalHeader(), &QHeaderView::sectionDoubleClicked, this, [=]() {
+            bool isExpanded = (*pParentExpanded).value(p, true);  // 获取当前父级是否展开的状态
 
             if (isExpanded) {
                 for (int i = 1; i <= childrenPerParent; ++i) {
@@ -163,10 +164,10 @@ QTableWidget* Routing::createMatrixTable() {
                     table->showRow(currentRow + i);
                 }
             }
-            parentExpanded[p] = !isExpanded;  // 切换父级的展开状态
+            (*pParentExpanded)[p] = !isExpanded;  // 切换父级的展开状态
         });
-        connect(table->horizontalHeader(), &QHeaderView::sectionDoubleClicked, this, [=, &parentExpanded]() {
-            bool isExpanded = parentExpanded.value(p, true);  // 获取当前父级是否展开的状态
+        connect(table->horizontalHeader(), &QHeaderView::sectionDoubleClicked, this, [=]() {
+            bool isExpanded = (*pParentExpanded).value(p, true);  // 获取当前父级是否展开的状态
 
             if (isExpanded) {
                 for (int i = 1; i <= childrenPerParent; ++i) {
@@ -178,7 +179,7 @@ QTableWidget* Routing::createMatrixTable() {
                 }
             }
 
-            parentExpanded[p] = !isExpanded;  // 切换父级的展开状态
+            (*pParentExpanded)[p] = !isExpanded;  // 切换父级的展开状态
         });
 
 

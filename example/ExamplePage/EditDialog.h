@@ -10,6 +10,8 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include "ElaWidget.h"  // 继承自 ElaWidget
+#include "ElaComboBox.h"
+#include "ElaRadioButton.h"
 
 class EditDialog : public ElaWidget {
     Q_OBJECT
@@ -24,10 +26,10 @@ public:
 
 private:
     QPushButton *backupBtn, *restoreBtn, *rebootBtn, *updateFWBtn, *pairBtn;
-    QRadioButton *autoIPRadio, *manualIPRadio;
+    ElaRadioButton *autoIPRadio, *manualIPRadio;
     QLineEdit *ipEdit, *netmaskEdit, *dnsEdit, *gatewayEdit;
     QPushButton *applyBtn, *revertBtn;
-    QComboBox *powerComboBox;
+    ElaComboBox *powerComboBox;
 };
 
 #endif // EDITDIALOG_H

@@ -22,8 +22,8 @@ private:
     T_IconDelegate* _iconDelegate;
 
 private slots:
-    void onButton1Clicked(const QModelIndex &index, const QString &buttonText);
-    void onButton2Clicked(const QModelIndex &index, const QString &buttonText);
+    void onEditClicked(const QModelIndex &index, const QString &buttonText);
+
 };
 
 #endif // DANTELIST_H

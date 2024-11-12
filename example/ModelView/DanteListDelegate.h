@@ -16,8 +16,7 @@ public:
     bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index) override;
 
 signals:
-    void button1Clicked(const QModelIndex &index);
-    void button2Clicked(const QModelIndex &index);
+    void editClicked(const QModelIndex &index);
 };
 
 #endif // DANTELISTDELEGATE_H

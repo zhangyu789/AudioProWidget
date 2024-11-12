@@ -6,6 +6,8 @@ VolumeGroup::VolumeGroup(QWidget* parent)
 {
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(0, 0, 0, 0);
+    mainLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+    _groupWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     mainLayout->addWidget(_groupWidget);  // 添加 GroupWidget 到布局中
 
     setLayout(mainLayout);
@@ -32,5 +34,6 @@ void VolumeGroup::setupData() {
     _groupWidget->addZone("Zone 1", "TX2 - 3", "Group 2");
     _groupWidget->addZone("Zone 2", "TX2 - 3", "Group 2");
 }
+
 
 

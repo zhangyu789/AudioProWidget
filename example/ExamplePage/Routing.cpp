@@ -38,7 +38,6 @@ Routing::Routing(QWidget* parent)
     // 设置整个表格控件的固定高度
     // matrixTable->setFixedHeight(800); // 设置高度为400，可根据需要调整
 
-
     matrixTable->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     // 禁止所有列调整大小
     matrixTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
@@ -95,7 +94,7 @@ void Routing::adjustTableHeight(QTableWidget* table) {
     totalHeight += extraHeight;
 
     // 设置表格控件的高度
-    table->setFixedHeight(totalHeight+5);
+    table->setFixedHeight(totalHeight + 10);
 }
 QGroupBox* Routing::createFilterGroup() {
     // 创建过滤器组
@@ -113,11 +112,11 @@ QGroupBox* Routing::createFilterGroup() {
 }
 
 QTableWidget* Routing::createMatrixTable() {
-    int parentCountRows = 4;  // 父级行数量，例如 Dante1 到 Dante4
-    int childrenPerParentRows = 3;  // 每个父级行下的子级数量
+    int parentCountRows = 8;  // 父级行数量，例如 Dante1 到 Dante4
+    int childrenPerParentRows = 5;  // 每个父级行下的子级数量
 
     int parentCountColumns = 5;  // 父级列数量，例如 Dante1 到 Dante4
-    int childrenPerParentColumns = 2;  // 每个父级列下的子级数量
+    int childrenPerParentColumns = 5;  // 每个父级列下的子级数量
 
     // 计算总的行和列数
     int rows = parentCountRows * (childrenPerParentRows + 1);  // 包含父级和子级行
@@ -129,7 +128,7 @@ QTableWidget* Routing::createMatrixTable() {
     pParentExpandedColumns = new QMap<int, bool>;  // 改为使用 QMap
 
     int currentRow = 0, currentColumn = 0;
-    int childCellSize = 25;  // 设置子级单元格大小
+    int childCellSize = 10;  // 设置子级单元格大小
 
     // 遍历每个父级
     for (int p = 0; p < parentCountRows; ++p) {
@@ -149,20 +148,34 @@ QTableWidget* Routing::createMatrixTable() {
 
         // 设置父级行高度
         table->resizeRowToContents(currentRow);
-        // 连接父级标签的点击事件，控制子级显示/隐藏
-        connect(table->verticalHeader(), &QHeaderView::sectionDoubleClicked, this, [=]() {
-            bool isExpanded = (*pParentExpandedRows).value(p, true);  // 获取当前父级是否展开的状态
+        // 连接父类行的双击事件，控制每个父类的子类行显示/隐藏
+        connect(table->verticalHeader(), &QHeaderView::sectionDoubleClicked, this, [=](int index) {
+            // 输出调试信息，确认信号触发
+            qDebug() << "Double-clicked on vertical header at index:" << index;
+            // 计算父类行的索引
+            int parentIndex = index / (childrenPerParentRows + 1);
 
-            if (isExpanded) {
-                for (int i = 1; i <= childrenPerParentRows; ++i) {
-                    table->hideRow(currentRow + i);
+            // 确保双击的是父类行
+            if (index % (childrenPerParentRows + 1) == 0) {
+                bool isExpanded = (*pParentExpandedRows).value(parentIndex, true);
+
+                int rowBase = parentIndex * (childrenPerParentRows + 1);
+
+                if (isExpanded) {
+                    for (int i = 1; i <= childrenPerParentRows; ++i) {
+                        table->hideRow(rowBase + i);
+                        qDebug() << "hideRow:" << rowBase + i;
+                    }
+                } else {
+                    for (int i = 1; i <= childrenPerParentRows; ++i) {
+                        table->showRow(rowBase + i);
+                        qDebug() << "showRow:" << rowBase + i;
+                    }
                 }
-            } else {
-                for (int i = 1; i <= childrenPerParentRows; ++i) {
-                    table->showRow(currentRow + i);
-                }
+
+                (*pParentExpandedRows)[parentIndex] = !isExpanded;
+
             }
-            (*pParentExpandedRows)[p] = !isExpanded;  // 切换父级的展开状态
         });
 
         // 更新当前行索引
@@ -187,21 +200,33 @@ QTableWidget* Routing::createMatrixTable() {
         // 设置父级列的高度
         table->resizeColumnToContents(currentColumn);
 
-        // 连接父级标签的点击事件，控制子级显示/隐藏
-        connect(table->horizontalHeader(), &QHeaderView::sectionDoubleClicked, this, [=]() {
-            bool isExpanded = (*pParentExpandedColumns).value(p, true);  // 获取当前父级是否展开的状态
+        // 连接父类列的双击事件，控制每个父类的子类列显示/隐藏
+        connect(table->horizontalHeader(), &QHeaderView::sectionDoubleClicked, this, [=](int index) {
+            // 输出调试信息，确认信号触发
+            qDebug() << "Double-clicked on horizontal header at index:" << index;
+            // 计算父类列的索引
+            int parentIndex = index / (childrenPerParentColumns + 1);
 
-            if (isExpanded) {
-                for (int i = 1; i <= childrenPerParentColumns; ++i) {
-                    table->hideColumn(currentColumn + i);
+            // 确保双击的是父类列
+            if (index % (childrenPerParentColumns + 1) == 0) {
+                bool isExpanded = (*pParentExpandedColumns).value(parentIndex, true);
+
+                int colBase = parentIndex * (childrenPerParentColumns + 1);
+
+                if (isExpanded) {
+                    for (int i = 1; i <= childrenPerParentColumns; ++i) {
+                        table->hideColumn(colBase + i);
+                        qDebug() << "hideColumn:" << colBase + i;
+                    }
+                } else {
+                    for (int i = 1; i <= childrenPerParentColumns; ++i) {
+                        table->showColumn(colBase + i);
+                        qDebug() << "showColumn:" << colBase + i;
+                    }
                 }
-            } else {
-                for (int i = 1; i <= childrenPerParentColumns; ++i) {
-                    table->showColumn(currentColumn + i);
-                }
+
+                (*pParentExpandedColumns)[parentIndex] = !isExpanded;
             }
-
-            (*pParentExpandedColumns)[p] = !isExpanded;  // 切换父级的展开状态
         });
 
 

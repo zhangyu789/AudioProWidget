@@ -252,7 +252,7 @@ void MainWindow::initContent()
     addPageNode("Icon", _iconPage, ElaIconType::FontAwesome);
 
 
-    // addFooterNode("About", nullptr, _aboutKey, 0, ElaIconType::User);
+    addFooterNode("About", nullptr, _aboutKey, 0, ElaIconType::User);
 
     T_About* aboutPage = new T_About();
     aboutPage->hide();

@@ -78,8 +78,7 @@ bool DanteListDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, co
     int radius = 10; // Corner radius
     if (button1Rect.contains(mouseEvent->pos()) && button1Rect.adjusted(1, 1, -1, -1).contains(mouseEvent->pos()))
     {
-        emit button1Clicked(index);
-        qDebug() << "Button 1 of item at row" << index.row() + 1 << "clicked";
+        emit editClicked(index);
     }
 
     return true;

@@ -1,4 +1,5 @@
 ﻿#include "DanteList.h"
+#include "EditDialog.h"
 
 #include <QApplication>
 #include <QClipboard>
@@ -28,9 +29,11 @@ DanteList::DanteList(QWidget* parent)
     tableHeaderFont.setPixelSize(12);
     _tableView->horizontalHeader()->setFont(tableHeaderFont);
     _tableView->setModel(_danteListModel);
-        _iconDelegate = new T_IconDelegate(this);
+    _iconDelegate = new T_IconDelegate(this);
     // 设置最后一列为操作列，并为其设置自定义委托
-    connect(_danteListDelegate, &DanteListDelegate::button1Clicked, this, [=](const QModelIndex& index) {
+    EditDialog* dialog = new EditDialog();
+    dialog->hide();
+    connect(_danteListDelegate, &DanteListDelegate::editClicked, this, [=](const QModelIndex& index) {
         QString deviceName = _danteListModel->getNameFromModelIndex(index);
         if (deviceName.isEmpty())
         {
@@ -38,16 +41,15 @@ DanteList::DanteList(QWidget* parent)
         }
         qApp->clipboard()->setText(deviceName);
         ElaMessageBar::success(ElaMessageBarType::Top, "复制完成", deviceName + "已被复制到剪贴板", 1000, this);
+
+
+        dialog->setFixedSize(500, 400);
+        dialog->setIsFixedSize(true);
+        dialog->moveToCenter();
+        dialog->show();
+
     });
-    connect(_danteListDelegate, &DanteListDelegate::button2Clicked, this, [=](const QModelIndex& index) {
-        QString deviceType = _danteListModel->getTypeFromModelIndex(index);
-        if (deviceType.isEmpty())
-        {
-            return;
-        }
-        qApp->clipboard()->setText(deviceType);
-        ElaMessageBar::success(ElaMessageBarType::Top, "复制完成", deviceType + "已被复制到剪贴板", 1000, this);
-    });
+
     _tableView->setItemDelegateForColumn(_danteListModel->columnCount() - 1, _danteListDelegate);
     // _tableView->installEventFilter(_danteListDelegate);
 
@@ -92,21 +94,7 @@ DanteList::~DanteList()
 {
 }
 
-void DanteList::onButton1Clicked(const QModelIndex &index, const QString &buttonText)
-{
-    //qDebug() << "Button clicked with text:" << buttonText;
-    if (buttonText == "Edit")
-    {
-        // 处理编辑逻辑
-        //qDebug() << "Handling Edit button logic.";
-        ElaMessageBar::success(ElaMessageBarType::Top, "复制完成", buttonText + "已被复制到剪贴板", 1000, this);
-    }
-    else
-    {
-        //qDebug() << "Unknown button text:" << buttonText;
-    }
-}
-void DanteList::onButton2Clicked(const QModelIndex &index, const QString &buttonText)
+void DanteList::onEditClicked(const QModelIndex &index, const QString &buttonText)
 {
     //qDebug() << "Button clicked with text:" << buttonText;
     if (buttonText == "Edit")

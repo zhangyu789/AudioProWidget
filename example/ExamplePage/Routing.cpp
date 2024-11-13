@@ -32,13 +32,18 @@ Routing::Routing(QWidget* parent)
     // 使用样式表仅隐藏内部的网格线，而保留外边框
     matrixTable->setStyleSheet("QTableWidget {border: 0px solid black;}");
 
-
+    // 设置水平表头高度
+    matrixTable->horizontalHeader()->setStyleSheet("QHeaderView::section { height: 50px; }");
 
     // 设置整个表格控件的固定高度
     // matrixTable->setFixedHeight(800); // 设置高度为400，可根据需要调整
 
 
     matrixTable->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    // 禁止所有列调整大小
+    matrixTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+    // 禁止所有行调整大小
+    matrixTable->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
 
     // 根据内容计算表格高度并设置
     adjustTableHeight(matrixTable);
@@ -90,7 +95,7 @@ void Routing::adjustTableHeight(QTableWidget* table) {
     totalHeight += extraHeight;
 
     // 设置表格控件的高度
-    table->setFixedHeight(totalHeight+20);
+    table->setFixedHeight(totalHeight+5);
 }
 QGroupBox* Routing::createFilterGroup() {
     // 创建过滤器组
@@ -120,15 +125,15 @@ QTableWidget* Routing::createMatrixTable() {
     QTableWidget *table = new QTableWidget(rows, columns);
 
     // 用于跟踪每个父级是否被展开的状态
-    QMap<int, bool>* pParentExpanded = new QMap<int, bool>;  // 改为使用 QMap
+    pParentExpandedRows = new QMap<int, bool>;  // 改为使用 QMap
+    pParentExpandedColumns = new QMap<int, bool>;  // 改为使用 QMap
 
     int currentRow = 0, currentColumn = 0;
-    int childCellSize = 25;  // 设置子级单元格大小，使其成为正方形
-    int parentCellSize = 50;  // 设置父级单元格大小，使其成为正方形
+    int childCellSize = 25;  // 设置子级单元格大小
 
     // 遍历每个父级
     for (int p = 0; p < parentCountRows; ++p) {
-        (*pParentExpanded)[p] = true;
+        (*pParentExpandedRows)[p] = true;
         QString parentLabel = QString("Receiver%1").arg(p + 1);
 
         // 创建父级行的标签
@@ -140,21 +145,13 @@ QTableWidget* Routing::createMatrixTable() {
             QString childLabelRow = QString("%1").arg(r, 2, 10, QChar('0'));
             table->setVerticalHeaderItem(currentRow + r, new QTableWidgetItem(childLabelRow));
             table->setRowHeight(currentRow + r, childCellSize);
-
         }
 
-        // 设置父级行和列的高度和宽度不同于子级，使其视觉上更明显
-        // table->setRowHeight(currentRow, parentCellSize);  // 父级行高度
-        // table->setColumnWidth(currentColumn, parentCellSize);  // 父级列宽度
+        // 设置父级行高度
         table->resizeRowToContents(currentRow);
-        // 隐藏父级单元格的交互
-        QTableWidgetItem *parentItem = new QTableWidgetItem("");
-        parentItem->setFlags(Qt::NoItemFlags);
-        table->setItem(currentRow, currentColumn, parentItem);
-
         // 连接父级标签的点击事件，控制子级显示/隐藏
         connect(table->verticalHeader(), &QHeaderView::sectionDoubleClicked, this, [=]() {
-            bool isExpanded = (*pParentExpanded).value(p, true);  // 获取当前父级是否展开的状态
+            bool isExpanded = (*pParentExpandedRows).value(p, true);  // 获取当前父级是否展开的状态
 
             if (isExpanded) {
                 for (int i = 1; i <= childrenPerParentRows; ++i) {
@@ -165,16 +162,15 @@ QTableWidget* Routing::createMatrixTable() {
                     table->showRow(currentRow + i);
                 }
             }
-            (*pParentExpanded)[p] = !isExpanded;  // 切换父级的展开状态
+            (*pParentExpandedRows)[p] = !isExpanded;  // 切换父级的展开状态
         });
-
 
         // 更新当前行索引
         currentRow += childrenPerParentRows + 1;
 
     }
     for (int p = 0; p < parentCountColumns; ++p) {
-        (*pParentExpanded)[p] = true;
+        (*pParentExpandedColumns)[p] = true;
         QString parentLabel = QString("Transmitter%1").arg(p + 1);
 
         // 创建父级列的标签
@@ -188,19 +184,12 @@ QTableWidget* Routing::createMatrixTable() {
             table->setColumnWidth(currentColumn + c, childCellSize);
         }
 
-        // 设置父级行和列的高度和宽度不同于子级，使其视觉上更明显
-        // table->setRowHeight(currentRow, parentCellSize);  // 父级行高度
-        // table->setColumnWidth(currentColumn, parentCellSize);  // 父级列宽度
+        // 设置父级列的高度
         table->resizeColumnToContents(currentColumn);
-
-        // 隐藏父级单元格的交互
-        QTableWidgetItem *parentItem = new QTableWidgetItem("");
-        parentItem->setFlags(Qt::NoItemFlags);
-        table->setItem(currentRow, currentColumn, parentItem);
 
         // 连接父级标签的点击事件，控制子级显示/隐藏
         connect(table->horizontalHeader(), &QHeaderView::sectionDoubleClicked, this, [=]() {
-            bool isExpanded = (*pParentExpanded).value(p, true);  // 获取当前父级是否展开的状态
+            bool isExpanded = (*pParentExpandedColumns).value(p, true);  // 获取当前父级是否展开的状态
 
             if (isExpanded) {
                 for (int i = 1; i <= childrenPerParentColumns; ++i) {
@@ -212,7 +201,7 @@ QTableWidget* Routing::createMatrixTable() {
                 }
             }
 
-            (*pParentExpanded)[p] = !isExpanded;  // 切换父级的展开状态
+            (*pParentExpandedColumns)[p] = !isExpanded;  // 切换父级的展开状态
         });
 
 
@@ -234,6 +223,42 @@ QTableWidget* Routing::createMatrixTable() {
                     item->setCheckState(Qt::Unchecked);
                     table->setItem(rowBase + r, colBase + c, item);
                 }
+            }
+        }
+    }
+
+    // 遍历父类行和列，禁用指定的单元格
+    for (int pr = 0; pr < parentCountRows; ++pr) {
+        int rowBase = pr * (childrenPerParentRows + 1);  // 父类行的起始位置
+        for (int pc = 0; pc < parentCountColumns; ++pc) {
+            int colBase = pc * (childrenPerParentColumns + 1);  // 父类列的起始位置
+
+            // 1. 禁用父类行和父类列的交叉单元格
+            QTableWidgetItem *parentItem = table->item(rowBase, colBase);
+            if (!parentItem) {
+                parentItem = new QTableWidgetItem();
+                table->setItem(rowBase, colBase, parentItem);
+            }
+            parentItem->setFlags(Qt::NoItemFlags);
+
+            // 2. 禁用父类行和子类列的交叉单元格
+            for (int c = 1; c <= childrenPerParentColumns; ++c) {
+                QTableWidgetItem *childColumnItem = table->item(rowBase, colBase + c);
+                if (!childColumnItem) {
+                    childColumnItem = new QTableWidgetItem();
+                    table->setItem(rowBase, colBase + c, childColumnItem);
+                }
+                childColumnItem->setFlags(Qt::NoItemFlags);
+            }
+
+            // 3. 禁用子类行和父类列的交叉单元格
+            for (int r = 1; r <= childrenPerParentRows; ++r) {
+                QTableWidgetItem *childRowItem = table->item(rowBase + r, colBase);
+                if (!childRowItem) {
+                    childRowItem = new QTableWidgetItem();
+                    table->setItem(rowBase + r, colBase, childRowItem);
+                }
+                childRowItem->setFlags(Qt::NoItemFlags);
             }
         }
     }
